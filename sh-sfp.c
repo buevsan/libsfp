@@ -79,16 +79,6 @@ int print_help()
   printf("-b -- show bit fields\n\n");
 }
 
-#if 0
- #define LIBSFP_FLAGS_LONGOPT            1
- #define LIBSFP_FLAGS_HEXOUTPUT          2
-#define LIBSFP_FLAGS_PRINT_UNKNOWN      4
-#define LIBSFP_FLAGS_PRINT_CALIBRATIONS 0x08
-#define LIBSFP_FLAGS_PRINT_THRESHOLDS   0x10
-#define LIBSFP_FLAGS_PRINT_BITOPTIONS   0x20
-#define LIBSFP_FLAGS_PRINT_LASERAUTO    0x40
-#endif
-
 int parse_args(int argc, char **argv, prm_t *prm)
 {
    int opt;
