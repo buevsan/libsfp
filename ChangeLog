@@ -1,0 +1,56 @@
+libx10-sfp (0.0.4) unstable; urgency=low
+
+  2014-10-22
+    * libsfp.c: убрано лишнее декларирование функций для исправления ошибок
+      сборки [sk]
+
+  2014-10-21
+    * libsfp.c: исправлены ошибки, обнаруженные -Werror [sk, visaev]
+
+ -- Paul Wolneykien <p.wolneykien@metrotek.spb.ru>  Fri, 31 Oct 2014 17:31:00 +0400
+
+libx10-sfp (0.0.3) unstable; urgency=low
+
+  2014-06-25
+
+    * Install the files with `install -p` to avoid extra rebuild
+      of the dependent packages [pw]
+
+  2014-06-24
+
+    * Make the (source) package version not include the debian
+      package release version [pw]
+    * Rename the .so/.pc: use the "libx10-<name>" scheme [pw]
+    * Add the --disable-rpath option to the configure script [pw]
+    * Use Autotools (and Libtool). Provide pkg-config info [pw]
+
+ -- Paul Wolneykien <p.wolneykien@metrotek.spb.ru>  Fri, 24 Jun 2014 15:38:18 +0400
+
+libx10-sfp (0.0.2) unstable; urgency=low
+
+  2014/06/03
+   ! libsfp.c: исправление warnings [sk]
+   * Makefile: флаги -g, -Wall, -Werror [sk]
+
+ -- Sergey Kolemagin <s.kolemagin@metrotek.spb.ru>  Tue, 03 Jun 2014 14:12:20 +0400
+
+libx10-sfp (0.0.1) unstable; urgency=low
+
+  2013/11/15
+
+    * libsfp.c: Доработанна функция определения скорости SFP  модуля [san]
+
+  2013/10/10
+
+    * libsfp.c: Исправлен вывод длинны для DirectAttach [san]
+
+  2013/09/11   
+
+    * libsfp.c:
+    * libsfp.h:  Добавлена функция распознающая DirrectAttach кабели [san]
+
+  2013/08/07
+    + ChangeLog: added [fam]
+ 
+ -- Alexander Buev <a.buev@metrotek.spb.ru>  Wed, 07 Aug 2013 14:29:20 +0400
+

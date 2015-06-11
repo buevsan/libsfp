@@ -1,0 +1,58 @@
+#!/bin/sh
+
+suffix0="-a0.bin"
+suffix2="-a2.bin"
+a0="0x50"
+a2="0x51"
+
+optspec="h0:2:s-:"
+while getopts "$optspec" optchar; do
+    case "${optchar}" in
+        -)
+            case "${OPTARG}" in
+                ip)
+                    ip="${!OPTIND}"; OPTIND=$(( $OPTIND + 1 ))
+                    ;;
+                *)
+                    ;;
+            esac;;
+        0)
+           a0=${OPTARG}
+           ;; 
+        2)
+           a2=${OPTARG}  
+           ;;
+        s)
+           split="1"
+           ;;
+        h)
+            echo 'sfp-dump <options> [I2CBUSNUM] [outfileprefix]'
+            echo
+            echo '-s         -- split dump as two separate files'
+            echo '-0 hexaddr -- A0 i2c address default 0x50' 
+            echo '-2 hexaddr -- A2 i2c address default 0x51'           
+            echo
+            exit 2
+            ;;
+        *)
+            ;;
+    esac
+done
+
+#echo $OPTIND
+
+shift $(($OPTIND-1))
+
+OUT="$2"
+BUS="$1"
+
+i2cdump -y "$BUS" "$a0" 2> /dev/null | grep -v ^' ' | cut -f 2-17 -d' ' | xxd -g1 -r -p > "$OUT""$suffix0"
+i2cdump -y "$BUS" "$a2" 2> /dev/null | grep -v ^' ' | cut -f 2-17 -d' ' | xxd -g1 -r -p > "$OUT""$suffix2"
+
+if [ -z "$split" ] ; then
+  #echo no split
+  cat "$OUT""$suffix2" >> "$OUT""$suffix0"
+  mv "$OUT$suffix0" "$OUT".bin
+  rm "$OUT""$suffix2"
+fi
+
