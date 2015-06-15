@@ -139,7 +139,7 @@ typedef struct {
   uint32_t spmode;      /* SFP module speed mode see LIBSFP_SPEED_MODE_* */
 } sfp_brief_info_t;
 
-typedef int(*sfp_readregs_fun_t)(void *udata, uint8_t i2caddr,
+typedef int(*sfp_readregs_fun_t)(void *udata, uint8_t addr,
                                  uint16_t start, uint16_t count, void *data);
 
 
