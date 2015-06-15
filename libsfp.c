@@ -1284,6 +1284,12 @@ int libsfp_readinfo_brief(libsfp_t *h, sfp_brief_info_t *info)
   return 0;
 }
 
+/**
+ * @brief Get SFP module speed (See LIBSFP_SPEED_MODE_* constants)
+ * @param h      - library handle
+ * @param smode  - speed
+ * @return 0 on success
+ */
 int libsfp_get_speed_mode(libsfp_t *h, uint32_t *smode)
 {
   uint8_t br, tr[8];
@@ -1309,6 +1315,12 @@ int libsfp_get_speed_mode(libsfp_t *h, uint32_t *smode)
   return 0;
 }
 
+/**
+ * @brief Check that SFP module is a copper ethernet module
+ * @param h   - library handle
+ * @param ans - answer (0/1 - Other/Copper ethernet)
+ * @return 0 on success
+ */
 int libsfp_is_copper_eth(libsfp_t *h, uint8_t *ans)
 {
   if (READREG_A0(6, 1, ans))
@@ -1318,6 +1330,12 @@ int libsfp_is_copper_eth(libsfp_t *h, uint8_t *ans)
   return 0;
 }
 
+/**
+ * @brief Check that SFP module is Dirrect Attach cable module
+ * @param h   - library handle
+ * @param ans - answer (0/1 - Normal/Dirrect Attach)
+ * @return 0 on success
+ */
 int libsfp_is_directattach(libsfp_t *h, uint8_t *ans)
 {
   (*ans) = 0;
@@ -1339,6 +1357,12 @@ int libsfp_is_directattach(libsfp_t *h, uint8_t *ans)
   return 0;
 }
 
+/**
+ * @brief Get copper length in case of copper ethernet module
+ * @param h    -  library handle
+ * @param ans  -  length of cable (m)
+ * @return 0 on success
+ */
 int libsfp_get_copper_length(libsfp_t *h, uint8_t *ans)
 {
   if (READREG_A0(18, 1, ans))

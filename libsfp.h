@@ -131,26 +131,26 @@ typedef struct {
 
 
 typedef struct {
-  char vendor[17];      /* SFP module vendor name */
-  char partnum[17];     /* SFP module part number */
-  float txpower;        /* SFP module tx power */
-  float rxpower;        /* SFP module rx power */
-  uint32_t bitrate;     /* SFP module rx power */
-  uint32_t spmode;      /* SFP module speed mode see LIBSFP_SPEED_MODE_* */
+  char vendor[17];      /** SFP module vendor name */
+  char partnum[17];     /** SFP module part number */
+  float txpower;        /** SFP module tx power */
+  float rxpower;        /** SFP module rx power */
+  uint32_t bitrate;     /** SFP module rx power */
+  uint32_t spmode;      /** SFP module speed mode see LIBSFP_SPEED_MODE_* */
 } sfp_brief_info_t;
 
 typedef int(*sfp_readregs_fun_t)(void *udata, uint8_t addr,
                                  uint16_t start, uint16_t count, void *data);
 
 
-#define LIBSFP_FLAGS_LONGOPT            1      /* Output options as long list */
-#define LIBSFP_FLAGS_HEXOUTPUT          2      /* Output hex values */
-#define LIBSFP_FLAGS_PRINT_UNKNOWN      4      /* Print fields with unknown values */
-#define LIBSFP_FLAGS_PRINT_CALIBRATIONS 0x08   /* Print calibrations section info */
-#define LIBSFP_FLAGS_PRINT_THRESHOLDS   0x10   /* Print thresholds section info */
-#define LIBSFP_FLAGS_PRINT_BITOPTIONS   0x20   /* Print bit options fields */
-#define LIBSFP_FLAGS_PRINT_LASERAUTO    0x40   /* Automaticaly detect laser/copper module
-                                                  and do not printing not used values */
+#define LIBSFP_FLAGS_LONGOPT            1      /** Output bit options as long list */
+#define LIBSFP_FLAGS_HEXOUTPUT          2      /** Output hex values */
+#define LIBSFP_FLAGS_PRINT_UNKNOWN      4      /** Print fields with unknown values */
+#define LIBSFP_FLAGS_PRINT_CALIBRATIONS 0x08   /** Print calibrations section info */
+#define LIBSFP_FLAGS_PRINT_THRESHOLDS   0x10   /** Print thresholds section info */
+#define LIBSFP_FLAGS_PRINT_BITOPTIONS   0x20   /** Print bit options fields */
+#define LIBSFP_FLAGS_PRINT_LASERAUTO    0x40   /** Automaticaly detect laser/copper module
+                                                   and do not printing not used values */
 
 
 #define LIBSFP_SPEED_MODE_UNKNOWN   0
@@ -158,8 +158,8 @@ typedef int(*sfp_readregs_fun_t)(void *udata, uint8_t addr,
 #define LIBSFP_SPEED_MODE_10G       10000
 #define LIBSFP_SPEED_MODE_20G       20000
 
-#define LIBSFP_DEF_A0_ADDRESS (0xA0>>1)       /* Default A0 Bank address on I2C bus */
-#define LIBSFP_DEF_A2_ADDRESS (0xA2>>1)       /* Default A2 Bank address on I2C bus */
+#define LIBSFP_DEF_A0_ADDRESS (0xA0>>1)       /** Default A0 Bank address */
+#define LIBSFP_DEF_A2_ADDRESS (0xA2>>1)       /** Default A2 Bank address */
 
 typedef struct {
   char sbuf[16];                 /** Internal string buffer */
@@ -170,24 +170,125 @@ typedef struct {
   sfp_readregs_fun_t readregs;   /** Callback for read information */
 } libsfp_t;
 
+/**
+ * @brief Create library handle with default parameters
+ * @param h - pointer to address of library handle
+ * @return 0 on success
+*/
 int libsfp_init(libsfp_t **h);
+
+/**
+ * @brief Free library handle and its memory
+ * @param h - pointer to library handle
+ * @return 0 on success
+*/
 int libsfp_free(libsfp_t *h);
 
+/**
+ * @brief Assign callback function address for reading access to SFP
+ * @param h - pointer to library handle
+ * @param readregs - address of callback function
+ * @return 0 on success
+ */
 int libsfp_set_readreg_callback(libsfp_t *h, sfp_readregs_fun_t readreg);
+
+/**
+ * @brief Assign userdata pointer for callback function
+ * @param h - pointer to library handle
+ * @param udata - pointer to user data
+ * @return 0 on success
+ */
 int libsfp_set_user_data(libsfp_t *h, void *udata);
+
+/**
+ * @brief Assign file pointer used for text output
+ * @param h - pointer to library handle
+ * @param f - file pointer
+ * @return 0 on success
+ */
 int libsfp_set_outfile(libsfp_t *h, FILE *f);
+
+/**
+ * @brief Assign some option flags used for modify output text information
+ * @param h - pointer to library handle
+ * @param flags - file pointer
+ * @return 0 on success
+ */
 int libsfp_set_flags(libsfp_t *h, uint32_t flags);
+
+/**
+ * @brief Assign bus addresses of two SFP memory banks
+ * @param h - pointer to library handle
+ * @param a0addr - address of first bank  A0
+ * @param a2addr - address of second bank A2
+ * @return 0 on success
+ */
 int libsfp_set_addresses(libsfp_t *h, uint8_t a0addr, uint8_t a2addr);
 
+/**
+ * @brief Read full SFP module info to memory
+ * @param h    - library handle
+ * @param dump - pointer to memory to store information
+ * @return 0 on success
+ */
 int libsfp_readinfo(libsfp_t *h, sfp_dump_t *d);
+
+/**
+ * @brief Output information selected by flags
+ *        as text to specified file
+ * @param h     - library handle
+ * @param dump  - pointer to struct that store information
+ * @return 0 on success
+ */
 void libsfp_printinfo(libsfp_t *h, sfp_dump_t *d);
+
+/**
+ * @brief Read and output information selected by flags
+ *        as text to specified file
+ * @param h     - library handle
+ * @return 0 on success
+ */
 int libsfp_showinfo(libsfp_t *h);
 
+/**
+ * @brief Read brief information for SFP module an store it to
+ *        specified place
+ * @param h    - library handle
+ * @param info - struct to store information
+ * @return
+ */
 int libsfp_readinfo_brief(libsfp_t *h, sfp_brief_info_t *info);
 
+/**
+ * @brief Get SFP module speed (See LIBSFP_SPEED_MODE_* constants)
+ * @param h      - library handle
+ * @param smode  - speed
+ * @return 0 on success
+ */
 int libsfp_get_speed_mode(libsfp_t *h, uint32_t *smode);
+
+/**
+ * @brief Check that SFP module is a copper ethernet module
+ * @param h   - library handle
+ * @param ans - answer (0/1 - Other/Copper ethernet)
+ * @return 0 on success
+ */
 int libsfp_is_copper_eth(libsfp_t *h, uint8_t *ans);
+
+/**
+ * @brief Get copper length in case of copper ethernet module
+ * @param h    -  library handle
+ * @param ans  -  length of cable (m)
+ * @return 0 on success
+ */
 int libsfp_get_copper_length(libsfp_t *h, uint8_t *ans);
+
+/**
+ * @brief Check that SFP module is Dirrect Attach cable module
+ * @param h   - library handle
+ * @param ans - answer (0/1 - Normal/Dirrect Attach)
+ * @return 0 on success
+ */
 int libsfp_is_directattach(libsfp_t *h, uint8_t *ans);
 
 
