@@ -3,8 +3,9 @@ lib_LTLIBRARIES = libx10-sfp.la
 libx10_sfp_la_SOURCES = libsfp.c
 libx10_sfp_la_LDFLAGS = -static
 
-bin_PROGRAMS = sh-sfp
-sh_sfp_LDADD=./libx10-sfp.la
+bin_PROGRAMS = sfp-dump
+sfp_dump_SOURCES = sfp-dump.c
+sfp_dump_LDADD=./libx10-sfp.la
 
 x10includedir = $(includedir)/x10
 x10include_HEADERS = libsfp.h
