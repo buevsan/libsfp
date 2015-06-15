@@ -68,7 +68,7 @@ int read_sfp_dump(void *udata, uint8_t i2caddr, uint16_t start,
 int print_help()
 {
   printf("\nDisplay SFP module dump information\n\n");
-  printf("sh-sfp <options> [file1.bin] <file2.bin>\n\n");
+  printf("sfp-dump <options> [file1.bin] <file2.bin>\n\n");
   printf("-h -- show help\n");
   printf("-v -- show verbose info (same as '-uctb')'\n");
   printf("-x -- show hex data\n");
