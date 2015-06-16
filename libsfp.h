@@ -162,12 +162,7 @@ typedef int(*sfp_readregs_fun_t)(void *udata, uint8_t addr,
 #define LIBSFP_DEF_A2_ADDRESS (0xA2>>1)       /** Default A2 Bank address */
 
 typedef struct {
-  char sbuf[16];                 /** Internal string buffer */
-  uint32_t flags;                /** Library flags  */
-  FILE *file;                    /** File for text output */
-  void *udata;                   /** User data pointer */
-  uint8_t a0addr, a2addr;        /** SFP Bank addresses to use */
-  sfp_readregs_fun_t readregs;   /** Callback for read information */
+  void *data;    /** Dummy pointer do not use this in user program */
 } libsfp_t;
 
 /**

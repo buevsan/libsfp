@@ -2,10 +2,21 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define SFPPRINT(format, ...) fprintf(h->file, format, ##__VA_ARGS__)
+#define SFPPRINT(format, ...) fprintf(H(h)->file, format, ##__VA_ARGS__)
 #define SFPPRINTNAME(name) SFPPRINT("%-32s %s",name, ": ")
-#define READREG_A0(reg, count, data) h->readregs(h->udata, h->a0addr, reg, count, data)
-#define READREG_A2(reg, count, data) h->readregs(h->udata, h->a2addr, reg, count, data)
+#define READREG_A0(reg, count, data) H(h)->readregs(H(h)->udata, H(h)->a0addr, reg, count, data)
+#define READREG_A2(reg, count, data) H(h)->readregs(H(h)->udata, H(h)->a2addr, reg, count, data)
+
+typedef struct {
+  char sbuf[16];                 /** Internal string buffer */
+  uint32_t flags;                /** Library flags  */
+  FILE *file;                    /** File for text output */
+  void *udata;                   /** User data pointer */
+  uint8_t a0addr, a2addr;        /** SFP Bank addresses to use */
+  sfp_readregs_fun_t readregs;   /** Callback for read information */
+} libsfp_int_t;
+
+#define H(ptr) ((libsfp_int_t*)(ptr))
 
 char degree_s[]="C ";
 char volts_s[]="V ";
@@ -59,16 +70,16 @@ typedef struct {
  */
 int libsfp_init(libsfp_t **h)
 {
-  (*h) = malloc(sizeof(libsfp_t));
-  if (!(*h))
+  (*h) = malloc(sizeof(libsfp_int_t));
+  if (!H(*h))
     return -1;
-  memset((*h), 0, sizeof(libsfp_t));
+  memset(H(*h), 0, sizeof(libsfp_int_t));
 
-  (*h)->file = stdout;
-  (*h)->flags = LIBSFP_FLAGS_LONGOPT;
+  H(*h)->file = stdout;
+  H(*h)->flags = LIBSFP_FLAGS_LONGOPT;
 
-  (*h)->a0addr = LIBSFP_DEF_A0_ADDRESS;
-  (*h)->a2addr = LIBSFP_DEF_A2_ADDRESS;
+  H(*h)->a0addr = LIBSFP_DEF_A0_ADDRESS;
+  H(*h)->a2addr = LIBSFP_DEF_A2_ADDRESS;
 
   return 0;
 }
@@ -92,7 +103,7 @@ int libsfp_free(libsfp_t *h)
  */
 int libsfp_set_readreg_callback(libsfp_t *h, sfp_readregs_fun_t readregs)
 {
-  h->readregs = readregs;
+  H(h)->readregs = readregs;
   return 0;
 }
 
@@ -104,7 +115,7 @@ int libsfp_set_readreg_callback(libsfp_t *h, sfp_readregs_fun_t readregs)
  */
 int libsfp_set_user_data(libsfp_t *h, void *udata)
 {
-  h->udata = udata;
+  H(h)->udata = udata;
   return 0;
 }
 
@@ -116,7 +127,7 @@ int libsfp_set_user_data(libsfp_t *h, void *udata)
  */
 int libsfp_set_outfile(libsfp_t *h, FILE *f)
 {
-  h->file = f;
+  H(h)->file = f;
   return 0;
 }
 
@@ -128,7 +139,7 @@ int libsfp_set_outfile(libsfp_t *h, FILE *f)
  */
 int libsfp_set_flags(libsfp_t *h, uint32_t flags)
 {
-  h->flags = flags;
+  H(h)->flags = flags;
   return 0;
 }
 
@@ -141,8 +152,8 @@ int libsfp_set_flags(libsfp_t *h, uint32_t flags)
  */
 int libsfp_set_addresses(libsfp_t *h, uint8_t a0addr, uint8_t a2addr)
 {
-  h->a0addr = a0addr;
-  h->a2addr = a2addr;
+  H(h)->a0addr = a0addr;
+  H(h)->a2addr = a2addr;
   return 0;
 }
 
@@ -164,15 +175,15 @@ void libsfp_print_uint8_f(libsfp_t *h, libsfp_uint8_2s_fun fun, char *name, uint
     SFPPRINTNAME(name);
     SFPPRINT("%s",s);
   } else
-    if (h->flags & LIBSFP_FLAGS_PRINT_UNKNOWN) {
+    if (H(h)->flags & LIBSFP_FLAGS_PRINT_UNKNOWN) {
      SFPPRINTNAME(name);
      SFPPRINT("Unknown");
     }
 
-  if ( !((s) || (h->flags & LIBSFP_FLAGS_PRINT_UNKNOWN)) )
+  if ( !((s) || (H(h)->flags & LIBSFP_FLAGS_PRINT_UNKNOWN)) )
     return;
 
-  if (h->flags & LIBSFP_FLAGS_HEXOUTPUT)
+  if (H(h)->flags & LIBSFP_FLAGS_HEXOUTPUT)
     SFPPRINT(" (%02x)", (uint16_t)value);
 
   SFPPRINT("\n");
@@ -216,12 +227,12 @@ void libsfp_print_bitoptions(libsfp_t *h, char * name, libsfp_bitoptions_table_t
 {
   uint8_t i, max=0, min=0xFF; int offset;
 
-  if (!(h->flags & LIBSFP_FLAGS_PRINT_BITOPTIONS))
+  if (!(H(h)->flags & LIBSFP_FLAGS_PRINT_BITOPTIONS))
     return;
 
   SFPPRINTNAME(name);
 
-  if ((h->flags&LIBSFP_FLAGS_LONGOPT))
+  if ((H(h)->flags&LIBSFP_FLAGS_LONGOPT))
     SFPPRINT("\n");
 
   for (i=0; i< count; ++i) {
@@ -236,7 +247,7 @@ void libsfp_print_bitoptions(libsfp_t *h, char * name, libsfp_bitoptions_table_t
     if ((data[offset])&(0x1<<(tbl[i].bit))) {
 
 
-      if (h->flags&LIBSFP_FLAGS_LONGOPT) {
+      if (H(h)->flags&LIBSFP_FLAGS_LONGOPT) {
 
         SFPPRINT("%35s"," ");
         /*SFPPRINTNAME("-");*/
@@ -253,8 +264,8 @@ void libsfp_print_bitoptions(libsfp_t *h, char * name, libsfp_bitoptions_table_t
     }    
   }
 
-  if (h->flags&LIBSFP_FLAGS_HEXOUTPUT) {
-    if (h->flags&LIBSFP_FLAGS_LONGOPT)
+  if (H(h)->flags&LIBSFP_FLAGS_HEXOUTPUT) {
+    if (H(h)->flags&LIBSFP_FLAGS_LONGOPT)
       SFPPRINT("%35s"," ");
     else
       SFPPRINT(" ");
@@ -262,7 +273,7 @@ void libsfp_print_bitoptions(libsfp_t *h, char * name, libsfp_bitoptions_table_t
     libsfp_print_dump(h, &data[min], max-min+1);
     SFPPRINT(")\n");
   } else
-    if (!(h->flags&LIBSFP_FLAGS_LONGOPT))
+    if (!(H(h)->flags&LIBSFP_FLAGS_LONGOPT))
       SFPPRINT("\n");
 }
 
@@ -274,7 +285,7 @@ void libsfp_print_float(libsfp_t *h, char *name, sfp_uint32_field_t f)
   v = ((f.d[0])<<24) | ((f.d[1])<<16) | ((f.d[2])<<8) | (f.d[3]);
 
   SFPPRINT("%.2f", (float)v);
-  if (h->flags & LIBSFP_FLAGS_HEXOUTPUT)
+  if (H(h)->flags & LIBSFP_FLAGS_HEXOUTPUT)
     SFPPRINT(" (%08X)",v);
   SFPPRINT("\n");
 }
@@ -295,13 +306,13 @@ void libsfp_print_uint16_table(libsfp_t *h, sfp_uint16_tbl_t *tbl, uint16_t cnt,
   for (i = 0; i < cnt; ++i, ++f ) {
 
     if (tbl[i].v2s)
-      tbl[i].v2s(h->sbuf, *f);
+      tbl[i].v2s(H(h)->sbuf, *f);
     else
-      fun(h->sbuf, *f);
+      fun(H(h)->sbuf, *f);
 
     SFPPRINTNAME(tbl[i].name);
-    SFPPRINT("%s %s", h->sbuf, tbl[i].units_name);
-    if (h->flags & LIBSFP_FLAGS_HEXOUTPUT )
+    SFPPRINT("%s %s", H(h)->sbuf, tbl[i].units_name);
+    if (H(h)->flags & LIBSFP_FLAGS_HEXOUTPUT )
       SFPPRINT("(%04X)", ((f->d[0])<<8) | (f->d[1]));
     SFPPRINT("\n");
   }
@@ -311,10 +322,10 @@ void libsfp_print_uint32_table(libsfp_t *h, sfp_uint32_tbl_t *tbl, uint16_t cnt,
 {
   uint8_t i;
   for (i = 0; i < cnt; ++i, ++f ) {
-    fun(h->sbuf, *f);
+    fun(H(h)->sbuf, *f);
     SFPPRINTNAME(tbl[i].name);
-    SFPPRINT("%s %s", h->sbuf, tbl->units_name);
-    if (h->flags & LIBSFP_FLAGS_HEXOUTPUT)
+    SFPPRINT("%s %s", H(h)->sbuf, tbl->units_name);
+    if (H(h)->flags & LIBSFP_FLAGS_HEXOUTPUT)
       SFPPRINT("(%08X)", ((f->d[0])<<24) |((f->d[0])<<16) | ((f->d[0])<<8) | (f->d[1]));
     SFPPRINT("\n");
   }
@@ -502,10 +513,10 @@ void libsfp_brnominal2s(char *s, uint8_t brn)
 
 void libsfp_print_brnominal(libsfp_t *h, uint8_t brn)
 {
-  libsfp_brnominal2s(h->sbuf, brn);
+  libsfp_brnominal2s(H(h)->sbuf, brn);
   SFPPRINTNAME("Bit rate nominal");
-  SFPPRINT("%s MBits/s", h->sbuf);
-  if (h->flags & LIBSFP_FLAGS_HEXOUTPUT)
+  SFPPRINT("%s MBits/s", H(h)->sbuf);
+  if (H(h)->flags & LIBSFP_FLAGS_HEXOUTPUT)
     SFPPRINT(" (%02X)", (uint16_t)brn);
   SFPPRINT("\n");
 }
@@ -590,10 +601,10 @@ void libsfp_print_lengths(libsfp_t *h, uint8_t *d, char laser)
 
   for (i=0; i < sizeof(lengths_table)/sizeof(libsfp_uint8_tbl2_t); ++i, ++d) {
 
-    if ( !( (*d) || (h->flags & LIBSFP_FLAGS_PRINT_UNKNOWN)) )
+    if ( !( (*d) || (H(h)->flags & LIBSFP_FLAGS_PRINT_UNKNOWN)) )
       continue;
 
-    if (h->flags & LIBSFP_FLAGS_PRINT_LASERAUTO) {
+    if (H(h)->flags & LIBSFP_FLAGS_PRINT_LASERAUTO) {
 
       if ((laser) && (i==4))
         continue;
@@ -602,10 +613,10 @@ void libsfp_print_lengths(libsfp_t *h, uint8_t *d, char laser)
 
     }
 
-    lengths_table[i].v2s(h->sbuf, *d);
+    lengths_table[i].v2s(H(h)->sbuf, *d);
     SFPPRINTNAME(lengths_table[i].name);
-    SFPPRINT("%s %s", h->sbuf, lengths_table[i].units_name);
-    if (h->flags & LIBSFP_FLAGS_HEXOUTPUT)
+    SFPPRINT("%s %s", H(h)->sbuf, lengths_table[i].units_name);
+    if (H(h)->flags & LIBSFP_FLAGS_HEXOUTPUT)
       SFPPRINT(" (%02X)", (uint16_t)(*d));
     SFPPRINT("\n");
 
@@ -621,13 +632,13 @@ void libsfp_wavelength2s(char *s, uint8_t *d)
 
 void libsfp_print_wavelength(libsfp_t *h, uint8_t *d)
 {
-  if ( !( (*d) || (h->flags & LIBSFP_FLAGS_PRINT_UNKNOWN)) )
+  if ( !( (*d) || (H(h)->flags & LIBSFP_FLAGS_PRINT_UNKNOWN)) )
     return;
 
-  libsfp_wavelength2s(h->sbuf, d);
+  libsfp_wavelength2s(H(h)->sbuf, d);
   SFPPRINTNAME("Laser wave length ");
-  SFPPRINT("%s nm", h->sbuf);
-  if (h->flags & LIBSFP_FLAGS_HEXOUTPUT)
+  SFPPRINT("%s nm", H(h)->sbuf);
+  if (H(h)->flags & LIBSFP_FLAGS_HEXOUTPUT)
     SFPPRINT(" (%04X)", *((uint16_t*)d));
   SFPPRINT("\n");
 }
@@ -662,13 +673,13 @@ void libsfp_brminmax2s(char *s, uint8_t brnominal, uint8_t br)
 
 void libsfp_print_brminmax(libsfp_t *h, char *name, uint8_t br_nominal, uint8_t br)
 {
-  if ( !( (br) || (h->flags & LIBSFP_FLAGS_PRINT_UNKNOWN)) )
+  if ( !( (br) || (H(h)->flags & LIBSFP_FLAGS_PRINT_UNKNOWN)) )
     return;
 
-  libsfp_brminmax2s(h->sbuf, br_nominal, br);
+  libsfp_brminmax2s(H(h)->sbuf, br_nominal, br);
   SFPPRINTNAME(name);
-  SFPPRINT("%s Mbits/s", h->sbuf);
-  if (h->flags & LIBSFP_FLAGS_HEXOUTPUT)
+  SFPPRINT("%s Mbits/s", H(h)->sbuf);
+  if (H(h)->flags & LIBSFP_FLAGS_HEXOUTPUT)
     SFPPRINT(" (%02X)", (uint16_t)br);
   SFPPRINT("\n");
 }
@@ -682,9 +693,9 @@ void libsfp_datecode2s(char *s, uint8_t *d)
 
 void libsfp_print_datecode(libsfp_t *h, uint8_t *d)
 {
-  libsfp_datecode2s(h->sbuf, d);
+  libsfp_datecode2s(H(h)->sbuf, d);
   SFPPRINTNAME("Date code");
-  SFPPRINT("%s\n", h->sbuf);
+  SFPPRINT("%s\n", H(h)->sbuf);
 }
 
 libsfp_bitoptions_table_t montype_table[]= {
@@ -758,7 +769,7 @@ void libsfp_print_base_fields(libsfp_t *h, sfp_base_fields_t *bf)
 {
   int laser;
 
-  laser = (h->flags & LIBSFP_FLAGS_PRINT_LASERAUTO)?libsfp_is_laser_availble(bf):1;
+  laser = (H(h)->flags & LIBSFP_FLAGS_PRINT_LASERAUTO)?libsfp_is_laser_availble(bf):1;
 
   libsfp_print_identifier(h, bf->identifier);
   libsfp_print_extidentifier(h, bf->ext_identifier);
@@ -934,17 +945,17 @@ void libsfp_print_thresholds(libsfp_t *h, sfp_uint16_field_t * f, sfp_calibratio
   uint8_t i;
   sfp_uint16_field_t *hf;
 
-  if (!(h->flags & LIBSFP_FLAGS_PRINT_THRESHOLDS))
+  if (!(H(h)->flags & LIBSFP_FLAGS_PRINT_THRESHOLDS))
     return;
 
   for (i = 0; i < sizeof(th_table)/sizeof(sfp_threshold_tbl_t); ++i) {
     SFPPRINTNAME(th_table[i].name);
     hf = (f+1);
-    th_table[i].v2s(h->sbuf, *(f+1), cal);
-    SFPPRINT("%s - ",h->sbuf);
-    th_table[i].v2s(h->sbuf, *(f), cal);
-    SFPPRINT("%s %s", h->sbuf, th_table[i].units_name);
-    if (h->flags & LIBSFP_FLAGS_HEXOUTPUT)
+    th_table[i].v2s(H(h)->sbuf, *(f+1), cal);
+    SFPPRINT("%s - ",H(h)->sbuf);
+    th_table[i].v2s(H(h)->sbuf, *(f), cal);
+    SFPPRINT("%s %s", H(h)->sbuf, th_table[i].units_name);
+    if (H(h)->flags & LIBSFP_FLAGS_HEXOUTPUT)
       SFPPRINT("(%04X %04X)",
                ((f->d[1]<<8) | f->d[0]),
                ((hf->d[1]<<8) | hf->d[0]));
@@ -965,18 +976,18 @@ void libsfp_print_calpwr(libsfp_t *h, sfp_uint32_field_t * f)
 
   SFPPRINTNAME("RX_PWR 4/3/2/1/0");
   for (i = 0; i < 5; ++i, ++f ) {
-    libsfp_calpwr2s(h->sbuf, *f);
-    SFPPRINT("%s", h->sbuf);
+    libsfp_calpwr2s(H(h)->sbuf, *f);
+    SFPPRINT("%s", H(h)->sbuf);
     if (i!=4)
       SFPPRINT("/");
   }
 
-  if (h->flags & LIBSFP_FLAGS_HEXOUTPUT) {
+  if (H(h)->flags & LIBSFP_FLAGS_HEXOUTPUT) {
     SFPPRINT("\n");
     SFPPRINT("%35s"," ");
     SFPPRINT("(");
     for (i = 0; i < 5; ++i, ++f ) {
-        libsfp_calpwr2s(h->sbuf, *f);
+        libsfp_calpwr2s(H(h)->sbuf, *f);
         SFPPRINT("%08X", f->u32);
         if (i!=4)
           SFPPRINT("/");
@@ -1012,14 +1023,14 @@ void libsfp_print_slopeoffset(libsfp_t *h, sfp_uint16_field_t *f)
 
   for (i = 0; i < sizeof(slopeoffset_table)/sizeof(sfp_uint16_tbl_t); ++i, f+=2 ) {
     nf = (f+1);
-    libsfp_slope2s(h->sbuf, *f);
+    libsfp_slope2s(H(h)->sbuf, *f);
 
     SFPPRINTNAME(slopeoffset_table[i].name);
-    SFPPRINT("%s / ", h->sbuf);
-    libsfp_offset2s(h->sbuf, *nf);
+    SFPPRINT("%s / ", H(h)->sbuf);
+    libsfp_offset2s(H(h)->sbuf, *nf);
 
-    SFPPRINT("%s", h->sbuf);
-    if (h->flags & LIBSFP_FLAGS_HEXOUTPUT)
+    SFPPRINT("%s", H(h)->sbuf);
+    if (H(h)->flags & LIBSFP_FLAGS_HEXOUTPUT)
       SFPPRINT(" (%04X %04X)",((f->d[0])<<8) | (f->d[1]), ((nf->d[0])<<8) | (nf->d[1]));
     SFPPRINT("\n");
   }
@@ -1027,7 +1038,7 @@ void libsfp_print_slopeoffset(libsfp_t *h, sfp_uint16_field_t *f)
 
 void libsfp_print_calibrations(libsfp_t *h, sfp_calibration_fields_t *data)
 {
-  if (h->flags & LIBSFP_FLAGS_PRINT_CALIBRATIONS) {
+  if (H(h)->flags & LIBSFP_FLAGS_PRINT_CALIBRATIONS) {
     libsfp_print_calpwr(h, data->rx_pwr);
     libsfp_print_slopeoffset(h, &data->txi_slope);
   }
@@ -1079,10 +1090,10 @@ void libsfp_print_analog_values(libsfp_t *h, sfp_analog_tbl_t *tbl, analogvalues
   for (i = 0; i < cnt; ++i, ++f ) {
 
     /* print values */
-    tbl[i].v2s(h->sbuf, *f, cal);
+    tbl[i].v2s(H(h)->sbuf, *f, cal);
     SFPPRINTNAME(tbl[i].name);
-    SFPPRINT("%s %s", h->sbuf, tbl[i].units_name);
-    if (h->flags & LIBSFP_FLAGS_HEXOUTPUT)
+    SFPPRINT("%s %s", H(h)->sbuf, tbl[i].units_name);
+    if (H(h)->flags & LIBSFP_FLAGS_HEXOUTPUT)
       SFPPRINT("(%04X)", ((f->d[0])<<8) | (f->d[1]));
 
     /* print alarm warning status */
