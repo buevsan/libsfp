@@ -16,7 +16,7 @@ typedef struct {
   uint32_t flags;
 } prm_t;
 
-int read_sfp_dump(void *udata, uint8_t i2caddr, uint16_t start,
+int read_sfp_dump(void *udata, uint8_t bank_addr, uint16_t start,
               uint16_t count, void *data)
 {
   uint16_t offset;
@@ -31,14 +31,14 @@ int read_sfp_dump(void *udata, uint8_t i2caddr, uint16_t start,
   filename = prm->file1;
   offset = 0;
 
-  if (i2caddr == LIBSFP_DEF_A2_ADDRESS) {
+  if (bank_addr == LIBSFP_DEF_A2_ADDRESS) {
     if (prm->file2)
       filename = prm->file2;
     else
       offset = 0x100;
   }
 
-  /*printf("a:%x s:%u c:%u f:%s o:%u\n", i2caddr, start, count, filename, offset);*/
+  /*printf("a:%x s:%u c:%u f:%s o:%u\n", bank_addr, start, count, filename, offset);*/
 
   /* Open  file */
   f = fopen(filename, "rb");

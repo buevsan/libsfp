@@ -12,6 +12,8 @@
 #define READREG_A0(reg, count, data) H(h)->readregs(H(h)->udata, H(h)->a0addr, reg, count, data)
 #define READREG_A2(reg, count, data) H(h)->readregs(H(h)->udata, H(h)->a2addr, reg, count, data)
 
+#define ARRAY_SIZE(a) (sizeof(a)/sizeof(a[0]))
+
 typedef struct {
   char sbuf[16];                 /** Internal string buffer */
   uint32_t flags;                /** Library flags  */
@@ -30,10 +32,10 @@ char mVats_s[]="mW ";
 char uVats_s[]="uW ";
 char uAmps_s[]="uA ";
 
-typedef char *(*libsfp_uint8_2s_fun)(uint8_t);
-typedef void (*libsfp_uint8_2s_fun2)(char *, uint8_t);
-typedef void (*libsfp_uint16_2s_fun)(char *, sfp_uint16_field_t);
-typedef void (*libsfp_uint32_2s_fun)(char *, sfp_uint32_field_t);
+typedef char *(*libsfp_uint8_to_str_fun)(uint8_t);
+typedef void (*libsfp_uint8_to_str_fun2)(char *, uint8_t);
+typedef void (*libsfp_uint16_to_str_fun)(char *, sfp_uint16_field_t);
+typedef void (*libsfp_uint32_to_str_fun)(char *, sfp_uint32_field_t);
 
 typedef struct  {
   uint8_t value;
@@ -43,7 +45,7 @@ typedef struct  {
 typedef struct {
   char *name;
   char *units_name;
-  libsfp_uint8_2s_fun2 v2s;
+  libsfp_uint8_to_str_fun2 v2s;
 } libsfp_uint8_tbl2_t;
 
 typedef struct {
@@ -60,7 +62,7 @@ typedef struct {
 typedef struct {
   char *name;
   char *units_name;
-  libsfp_uint16_2s_fun v2s;
+  libsfp_uint16_to_str_fun v2s;
 } sfp_uint16_tbl_t;
 
 typedef struct {
@@ -171,7 +173,7 @@ char *libsfp_uint8_2s(libsfp_uint8_tbl_t *table, uint16_t count, uint8_t value)
   return 0;
 }
 
-void libsfp_print_uint8_f(libsfp_t *h, libsfp_uint8_2s_fun fun, char *name, uint8_t value)
+void libsfp_print_uint8_f(libsfp_t *h, libsfp_uint8_to_str_fun fun, char *name, uint8_t value)
 {
   char *s;
 
@@ -304,38 +306,6 @@ void libsfp_print_float_table(libsfp_t *h, sfp_floattbl_t *tbl, uint16_t cnt,  v
     libsfp_print_float(h, tbl[i].name, *f);
 }
 
-void libsfp_print_uint16_table(libsfp_t *h, sfp_uint16_tbl_t *tbl, uint16_t cnt, sfp_uint16_field_t *f, libsfp_uint16_2s_fun fun)
-{
-  uint8_t i;
-
-  for (i = 0; i < cnt; ++i, ++f ) {
-
-    if (tbl[i].v2s)
-      tbl[i].v2s(H(h)->sbuf, *f);
-    else
-      fun(H(h)->sbuf, *f);
-
-    SFPPRINTNAME(tbl[i].name);
-    SFPPRINT("%s %s", H(h)->sbuf, tbl[i].units_name);
-    if (H(h)->flags & LIBSFP_FLAGS_HEXOUTPUT )
-      SFPPRINT("(%04X)", ((f->d[0])<<8) | (f->d[1]));
-    SFPPRINT("\n");
-  }
-}
-
-void libsfp_print_uint32_table(libsfp_t *h, sfp_uint32_tbl_t *tbl, uint16_t cnt, sfp_uint32_field_t *f, libsfp_uint32_2s_fun fun)
-{
-  uint8_t i;
-  for (i = 0; i < cnt; ++i, ++f ) {
-    fun(H(h)->sbuf, *f);
-    SFPPRINTNAME(tbl[i].name);
-    SFPPRINT("%s %s", H(h)->sbuf, tbl->units_name);
-    if (H(h)->flags & LIBSFP_FLAGS_HEXOUTPUT)
-      SFPPRINT("(%08X)", ((f->d[0])<<24) |((f->d[0])<<16) | ((f->d[0])<<8) | (f->d[1]));
-    SFPPRINT("\n");
-  }
-}
-
 /* Identifier */
 
 libsfp_uint8_tbl_t identifier_tbl[] = {
@@ -347,7 +317,7 @@ libsfp_uint8_tbl_t identifier_tbl[] = {
 char *libsfp_identifier2s(uint8_t id)
 {
   return libsfp_uint8_2s(identifier_tbl,
-                         sizeof(identifier_tbl)/sizeof(libsfp_uint8_tbl_t), id);
+                         ARRAY_SIZE(identifier_tbl), id);
 }
 
 void libsfp_print_identifier(libsfp_t *h, uint8_t id)
@@ -371,15 +341,13 @@ libsfp_uint8_tbl_t extidentifier_tbl[] = {
 char *libsfp_extidentifier2s(uint8_t id)
 {
   return libsfp_uint8_2s(extidentifier_tbl,
-                         sizeof(extidentifier_tbl)/sizeof(libsfp_uint8_tbl_t), id);
+                         ARRAY_SIZE(extidentifier_tbl), id);
 }
 
 void libsfp_print_extidentifier(libsfp_t *h, uint8_t id)
 {
   libsfp_print_uint8_f(h, libsfp_extidentifier2s, "Ext. identifier", id);
 }
-
-
 
 /* Connector */
 
@@ -404,7 +372,7 @@ libsfp_uint8_tbl_t connector_tbl[] = {
 char *libsfp_connector2s(uint8_t v)
 {
   return libsfp_uint8_2s(connector_tbl,
-                         sizeof(connector_tbl)/sizeof(libsfp_uint8_tbl_t), v);
+                         ARRAY_SIZE(connector_tbl), v);
 }
 
 void libsfp_print_connector(libsfp_t *h, uint8_t v)
@@ -483,7 +451,7 @@ libsfp_bitoptions_table_t trns_table[]= {
 void libsfp_print_transeiver(libsfp_t *h, uint8_t *data)
 {
   libsfp_print_bitoptions(h,"Transceiver", trns_table,
-                          sizeof(trns_table)/sizeof(libsfp_bitoptions_table_t),
+                          ARRAY_SIZE(trns_table),
                          data);
 }
 
@@ -501,7 +469,7 @@ libsfp_uint8_tbl_t ecoding_tbl[] = {
 char *libsfp_encoding2s(uint8_t en)
 {
   return libsfp_uint8_2s(ecoding_tbl,
-                         sizeof(ecoding_tbl)/sizeof(libsfp_uint8_tbl_t), en);
+                         ARRAY_SIZE(ecoding_tbl), en);
 }
 
 void libsfp_print_encoding(libsfp_t *h, uint8_t en)
@@ -541,7 +509,7 @@ libsfp_uint8_tbl_t rate_identifier_tbl[] = {
 char *libsfp_rate_identifier2s(uint8_t rid)
 {
   return libsfp_uint8_2s(rate_identifier_tbl,
-                         sizeof(rate_identifier_tbl)/sizeof(libsfp_uint8_tbl_t), rid);
+                         ARRAY_SIZE(rate_identifier_tbl), rid);
 }
 
 void libsfp_print_rate_identifier(libsfp_t *h, uint8_t rid)
@@ -604,7 +572,7 @@ void libsfp_print_lengths(libsfp_t *h, uint8_t *d, char laser)
 {
   uint16_t i;
 
-  for (i=0; i < sizeof(lengths_table)/sizeof(libsfp_uint8_tbl2_t); ++i, ++d) {
+  for (i=0; i < ARRAY_SIZE(lengths_table); ++i, ++d) {
 
     if ( !( (*d) || (H(h)->flags & LIBSFP_FLAGS_PRINT_UNKNOWN)) )
       continue;
@@ -665,7 +633,7 @@ libsfp_bitoptions_table_t opts_table[]= {
 void libsfp_print_options(libsfp_t *h, uint8_t *data)
 {
   libsfp_print_bitoptions(h,"Options", opts_table,
-                          sizeof(opts_table)/sizeof(libsfp_bitoptions_table_t),
+                          ARRAY_SIZE(opts_table),
                          data);
 }
 
@@ -715,7 +683,7 @@ libsfp_bitoptions_table_t montype_table[]= {
 void libsfp_print_montype(libsfp_t *h, uint8_t *data)
 {
   libsfp_print_bitoptions(h,"Monitoring type", montype_table,
-                          sizeof(montype_table)/sizeof(libsfp_bitoptions_table_t),
+                          ARRAY_SIZE(montype_table),
                          data);
 }
 
@@ -732,7 +700,7 @@ libsfp_bitoptions_table_t eoptions_table[]= {
 void libsfp_print_eoptions(libsfp_t *h, uint8_t *data)
 {
   libsfp_print_bitoptions(h,"Enhanced options", eoptions_table,
-                          sizeof(eoptions_table)/sizeof(libsfp_bitoptions_table_t),
+                          ARRAY_SIZE(eoptions_table),
                          data);
 }
 
@@ -750,7 +718,7 @@ libsfp_uint8_tbl_t sff8472compliance_tbl[] = {
 char *libsfp_sff8472compliance2s(uint8_t v)
 {
   return libsfp_uint8_2s(sff8472compliance_tbl,
-                         sizeof(sff8472compliance_tbl)/sizeof(libsfp_uint8_tbl_t), v);
+                         ARRAY_SIZE(sff8472compliance_tbl), v);
 }
 
 void libsfp_print_sff8472compliance(libsfp_t *h, uint8_t v)
@@ -953,7 +921,7 @@ void libsfp_print_thresholds(libsfp_t *h, sfp_uint16_field_t * f, sfp_calibratio
   if (!(H(h)->flags & LIBSFP_FLAGS_PRINT_THRESHOLDS))
     return;
 
-  for (i = 0; i < sizeof(th_table)/sizeof(sfp_threshold_tbl_t); ++i) {
+  for (i = 0; i < ARRAY_SIZE(th_table); ++i) {
     SFPPRINTNAME(th_table[i].name);
     hf = (f+1);
     th_table[i].v2s(H(h)->sbuf, *(f+1), cal);
@@ -1026,7 +994,7 @@ void libsfp_print_slopeoffset(libsfp_t *h, sfp_uint16_field_t *f)
   uint8_t i;
   sfp_uint16_field_t *nf;
 
-  for (i = 0; i < sizeof(slopeoffset_table)/sizeof(sfp_uint16_tbl_t); ++i, f+=2 ) {
+  for (i = 0; i < ARRAY_SIZE(slopeoffset_table); ++i, f+=2 ) {
     nf = (f+1);
     libsfp_slope2s(H(h)->sbuf, *f);
 
@@ -1129,7 +1097,7 @@ libsfp_bitoptions_table_t status_control_table[]= {
 void libsfp_print_status_control(libsfp_t *h, uint8_t *data)
 {
   libsfp_print_bitoptions(h,"Status/Control", status_control_table,
-                          sizeof(status_control_table)/sizeof(libsfp_bitoptions_table_t),
+                          ARRAY_SIZE(status_control_table),
                          data);
 }
 
@@ -1137,7 +1105,7 @@ void libsfp_print_rtdiagnostics(libsfp_t *h, sfp_rtdiagnostics_fields_t *rt, sfp
 {
   libsfp_print_analog_values(h, analogvalues_table,
                              (ext->en_options&0x80)?analogvalues_aw_table:0,
-                            sizeof(analogvalues_table)/sizeof(sfp_analog_tbl_t),
+                            ARRAY_SIZE(analogvalues_table),
                             rt,
                             (ext->diag_mon_type & 0x10)?cal:0);
   libsfp_print_status_control(h, &rt->status);
