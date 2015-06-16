@@ -1,3 +1,8 @@
+/**
+   @file
+   @brief main libsfp implementation source file
+*/
+
 #include "libsfp.h"
 #include <stdlib.h>
 #include <string.h>
@@ -1296,7 +1301,7 @@ int libsfp_readinfo_brief(libsfp_t *h, sfp_brief_info_t *info)
 }
 
 /**
- * @brief Get SFP module speed (See LIBSFP_SPEED_MODE_* constants)
+ * @brief Get SFP module max speed (See LIBSFP_SPEED_MODE_* constants)
  * @param h      - library handle
  * @param smode  - speed
  * @return 0 on success

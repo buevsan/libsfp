@@ -1,6 +1,11 @@
 #ifndef LIBSFP_H
 #define LIBSFP_H
 
+/**
+   @file
+   @brief Main libsfp header file
+*/
+
 #include <stdint.h>
 #include <stdio.h>
 
@@ -108,17 +113,17 @@ typedef struct {
   uint8_t unallocated3;
 } __attribute__((packed)) sfp_rtdiagnostics_fields_t;
 
-/* Bank at address A0 */
+/** Struct to present bank at address A0 */
 typedef struct {
   sfp_base_fields_t base;
   sfp_extended_fields_t ext;
 } __attribute__((packed)) sfp_A0_t;
 
-/* Bank at address A2 */
+/** Struct to present bank at address A2 */
 typedef struct {
-  sfp_thresholds_fields_t th;
-  sfp_calibration_fields_t cl;
-  sfp_rtdiagnostics_fields_t dg;
+  sfp_thresholds_fields_t th;        /** Threshold fields section */
+  sfp_calibration_fields_t cl;       /** Calibration fields section */
+  sfp_rtdiagnostics_fields_t dg;     /** Diagnostic fields section */  
   uint8_t vendor[8];
   uint8_t writable[120];
   uint8_t vendor2[8];
@@ -130,39 +135,53 @@ typedef struct {
 } __attribute__((packed)) sfp_dump_t;
 
 
+/** Struct to store brief information for SFP module */
 typedef struct {
   char vendor[17];      /** SFP module vendor name */
   char partnum[17];     /** SFP module part number */
-  float txpower;        /** SFP module tx power */
-  float rxpower;        /** SFP module rx power */
-  uint32_t bitrate;     /** SFP module rx power */
+  float txpower;        /** SFP module tx power (mW) */
+  float rxpower;        /** SFP module rx power (mW) */
+  uint32_t bitrate;     /** SFP module bitrate (bit/s)*/
   uint32_t spmode;      /** SFP module speed mode see LIBSFP_SPEED_MODE_* */
 } sfp_brief_info_t;
 
+/** @brief Callback used for reading SFP module register memory
+ *
+ *  @param udata   User provided data pointer\n
+ *                 (see libsfp_set_user_data to change)
+ *  @param addr    Memory bank address of SFP module\n
+ *                 see LIBSFP_DEF_* constants for defaut values\n
+ *                 see libsfp_set_addresses to changes default values
+ *  @param start   offset in bytes to start reading from
+ *  @param count   count of bytes to read
+ *  @param data    pointer to buffer to store data
+ */
 typedef int(*sfp_readregs_fun_t)(void *udata, uint8_t addr,
                                  uint16_t start, uint16_t count, void *data);
 
 
-#define LIBSFP_FLAGS_LONGOPT            1      /** Output bit options as long list */
-#define LIBSFP_FLAGS_HEXOUTPUT          2      /** Output hex values */
-#define LIBSFP_FLAGS_PRINT_UNKNOWN      4      /** Print fields with unknown values */
-#define LIBSFP_FLAGS_PRINT_CALIBRATIONS 0x08   /** Print calibrations section info */
-#define LIBSFP_FLAGS_PRINT_THRESHOLDS   0x10   /** Print thresholds section info */
-#define LIBSFP_FLAGS_PRINT_BITOPTIONS   0x20   /** Print bit options fields */
-#define LIBSFP_FLAGS_PRINT_LASERAUTO    0x40   /** Automaticaly detect laser/copper module
-                                                   and do not printing not used values */
+#define LIBSFP_FLAGS_LONGOPT            1      /**< Output bit options as long list */
+#define LIBSFP_FLAGS_HEXOUTPUT          2      /**< Output hex values */
+#define LIBSFP_FLAGS_PRINT_UNKNOWN      4      /**< Print fields with unknown values */
+#define LIBSFP_FLAGS_PRINT_CALIBRATIONS 0x08   /**< Print calibrations section info */
+#define LIBSFP_FLAGS_PRINT_THRESHOLDS   0x10   /**< Print thresholds section info */
+#define LIBSFP_FLAGS_PRINT_BITOPTIONS   0x20   /**< Print bit options fields */
+#define LIBSFP_FLAGS_PRINT_LASERAUTO    0x40   /**< Automaticaly detect laser/copper module
+                                                    and do not printing not used values */
 
 
-#define LIBSFP_SPEED_MODE_UNKNOWN   0
-#define LIBSFP_SPEED_MODE_1G        1000
-#define LIBSFP_SPEED_MODE_10G       10000
-#define LIBSFP_SPEED_MODE_20G       20000
+#define LIBSFP_SPEED_MODE_UNKNOWN   0     /**< Unknown speed */
+#define LIBSFP_SPEED_MODE_1G        1000  /**< 1 Gb/s */
+#define LIBSFP_SPEED_MODE_10G       10000 /**< 10 Gb/s */
+#define LIBSFP_SPEED_MODE_20G       20000 /**< 20 Gb/s */
 
-#define LIBSFP_DEF_A0_ADDRESS (0xA0>>1)       /** Default A0 Bank address */
-#define LIBSFP_DEF_A2_ADDRESS (0xA2>>1)       /** Default A2 Bank address */
+#define LIBSFP_DEF_A0_ADDRESS (0xA0>>1)       /**< Default A0 Bank address */
+#define LIBSFP_DEF_A2_ADDRESS (0xA2>>1)       /**< Default A2 Bank address */
 
+/** Main libsfp library handle struct\n
+ *  Use only pointer to this type
+*/
 typedef struct {
-  void *data;    /** Dummy pointer do not use this in user program */
 } libsfp_t;
 
 /**
@@ -255,7 +274,7 @@ int libsfp_showinfo(libsfp_t *h);
 int libsfp_readinfo_brief(libsfp_t *h, sfp_brief_info_t *info);
 
 /**
- * @brief Get SFP module speed (See LIBSFP_SPEED_MODE_* constants)
+ * @brief Get SFP module max speed (See LIBSFP_SPEED_MODE_* constants)
  * @param h      - library handle
  * @param smode  - speed
  * @return 0 on success
