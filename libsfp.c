@@ -8,11 +8,6 @@
 #include "libsfp_int.h"
 #include "libsfp_print.h"
 
-#define READREG_A0(h, reg, count, data) \
-    H(h)->readregs(H(h)->udata, H(h)->a0addr, reg, count, data)
-#define READREG_A2(h, reg, count, data) \
-    H(h)->readregs(H(h)->udata, H(h)->a2addr, reg, count, data)
-
 /**
  * @brief Create library handle with default parameters
  * @param h - pointer to address of library handle

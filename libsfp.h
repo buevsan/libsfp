@@ -127,23 +127,6 @@ int libsfp_set_flags(libsfp_t *h, uint32_t flags);
 int libsfp_set_addresses(libsfp_t *h, uint8_t a0addr, uint8_t a2addr);
 
 /**
- * @brief Read full SFP module info to memory
- * @param h    - library handle
- * @param dump - pointer to memory to store information
- * @return 0 on success
- */
-int libsfp_readinfo(libsfp_t *h, libsfp_dump_t *d);
-
-/**
- * @brief Output information selected by flags
- *        as text to specified file
- * @param h     - library handle
- * @param dump  - pointer to struct that store information
- * @return 0 on success
- */
-void libsfp_printinfo(libsfp_t *h, libsfp_dump_t *d);
-
-/**
  * @brief Read and output information selected by flags
  *        as text to specified file
  * @param h     - library handle

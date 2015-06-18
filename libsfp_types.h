@@ -130,10 +130,6 @@ typedef struct {
   uint8_t vendor2[8];
 } __attribute__((packed)) libsfp_A2_t;
 
-typedef struct {
-  libsfp_A0_t a0;
-  libsfp_A2_t a2;
-} __attribute__((packed)) libsfp_dump_t;
 
 
 #endif

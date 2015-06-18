@@ -10,6 +10,11 @@
 #include "libsfp.h"
 
 typedef struct {
+  libsfp_A0_t a0;
+  libsfp_A2_t a2;
+} __attribute__((packed)) libsfp_dump_t;
+
+typedef struct {
   char sbuf[16];                 /** Internal string buffer */
   uint32_t flags;                /** Library flags  */
   FILE *file;                    /** File for text output */
@@ -20,11 +25,15 @@ typedef struct {
 
 #define H(ptr) ((libsfp_int_t*)(ptr))
 
-#define READREG_A0(h, reg, count, data) \
-    H(h)->readregs(H(h)->udata, H(h)->a0addr, reg, count, data)
-#define READREG_A2(h, reg, count, data) \
-    H(h)->readregs(H(h)->udata, H(h)->a2addr, reg, count, data)
+#define READREG(h, bank_addr, reg_offset, count, dest) \
+    ((H(h)->readregs) ? \
+       H(h)->readregs(H(h)->udata, bank_addr, \
+                      reg_offset, count, dest) : -1)
 
+#define READREG_A0(h, reg_offset, count, dest) \
+    READREG(h, H(h)->a0addr, reg_offset, count, dest)
+#define READREG_A2(h, reg_offset, count, dest) \
+    READREG(h, H(h)->a2addr, reg_offset, count, dest)
 
 
 int libsfp_is_laser_availble(libsfp_base_fields_t *bf);
