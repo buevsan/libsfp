@@ -8,7 +8,7 @@ sfp_dump_SOURCES = sfp-dump.c
 sfp_dump_LDADD=./libx10-sfp.la
 
 x10includedir = $(includedir)/x10
-x10include_HEADERS = libsfp.h
+x10include_HEADERS = libsfp.h libsfp_regs.h
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = x10-sfp.pc

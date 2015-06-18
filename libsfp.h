@@ -9,19 +9,21 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#include <libsfp_regs.h>
+
 typedef struct {
   union {
     uint16_t u16;
     uint8_t d[2];
   };
-} __attribute__((packed)) sfp_uint16_field_t;
+} __attribute__((packed)) libsfp_u16_field_t;
 
 typedef struct {
   union {
     uint32_t u32;
     uint8_t d[4];
   };
-} __attribute__((packed)) sfp_uint32_field_t;
+} __attribute__((packed)) libsfp_u32_field_t;
 
 typedef struct {
   uint8_t identifier;
@@ -31,24 +33,24 @@ typedef struct {
   uint8_t encoding;
   uint8_t br_nominal;
   uint8_t rate_identifier;
-  uint8_t length_km;
-  uint8_t length_100m;
+  uint8_t length_smf_km;
+  uint8_t length_smf;
   uint8_t length_50um;
   uint8_t length_625um;
-  uint8_t length_active;
-  uint8_t length_50um_om3;
+  uint8_t length_cable;
+  uint8_t length_om3;
   uint8_t vendor_name[16];
   uint8_t transceiver2;
   uint8_t vendor_oui[3];
   uint8_t vendor_pn[16];
   uint8_t vendor_rev[4];
-  sfp_uint16_field_t wavelength;
+  libsfp_u16_field_t wavelength;
   uint8_t unallocated;
   uint8_t cc_base;
-} __attribute__((packed)) sfp_base_fields_t;
+} __attribute__((packed)) libsfp_base_fields_t;
 
 typedef struct {
-  sfp_uint16_field_t options;
+  libsfp_u16_field_t options;
   uint8_t br_max;
   uint8_t br_min;
   uint8_t vendor_sn[16];
@@ -57,52 +59,52 @@ typedef struct {
   uint8_t en_options;
   uint8_t sff8472_comp;
   uint8_t cc_ext;
-} __attribute__((packed)) sfp_extended_fields_t;
+} __attribute__((packed)) libsfp_extended_fields_t;
 
 typedef struct {
-  sfp_uint16_field_t temp_alarm_high;
-  sfp_uint16_field_t temp_alarm_low;
-  sfp_uint16_field_t temp_warn_high;
-  sfp_uint16_field_t temp_warn_low;
-  sfp_uint16_field_t voltage_alarm_high;
-  sfp_uint16_field_t voltage_alarm_low;
-  sfp_uint16_field_t voltage_warn_high;
-  sfp_uint16_field_t voltage_warn_low;
-  sfp_uint16_field_t bias_alarm_high;
-  sfp_uint16_field_t bias_alarm_low;
-  sfp_uint16_field_t bias_warn_high;
-  sfp_uint16_field_t bias_warn_low;
-  sfp_uint16_field_t txpower_alarm_high;
-  sfp_uint16_field_t txpower_alarm_low;
-  sfp_uint16_field_t txpower_warn_high;
-  sfp_uint16_field_t txpower_warn_low;
-  sfp_uint16_field_t rxpower_alarm_high;
-  sfp_uint16_field_t rxpower_alarm_low;
-  sfp_uint16_field_t rxpower_warn_high;
-  sfp_uint16_field_t rxpower_warn_low;
+  libsfp_u16_field_t temp_alarm_high;
+  libsfp_u16_field_t temp_alarm_low;
+  libsfp_u16_field_t temp_warn_high;
+  libsfp_u16_field_t temp_warn_low;
+  libsfp_u16_field_t voltage_alarm_high;
+  libsfp_u16_field_t voltage_alarm_low;
+  libsfp_u16_field_t voltage_warn_high;
+  libsfp_u16_field_t voltage_warn_low;
+  libsfp_u16_field_t bias_alarm_high;
+  libsfp_u16_field_t bias_alarm_low;
+  libsfp_u16_field_t bias_warn_high;
+  libsfp_u16_field_t bias_warn_low;
+  libsfp_u16_field_t txpower_alarm_high;
+  libsfp_u16_field_t txpower_alarm_low;
+  libsfp_u16_field_t txpower_warn_high;
+  libsfp_u16_field_t txpower_warn_low;
+  libsfp_u16_field_t rxpower_alarm_high;
+  libsfp_u16_field_t rxpower_alarm_low;
+  libsfp_u16_field_t rxpower_warn_high;
+  libsfp_u16_field_t rxpower_warn_low;
   uint8_t unallocated[16];
-} __attribute__((packed)) sfp_thresholds_fields_t;
+} __attribute__((packed)) libsfp_thresholds_fields_t;
 
 typedef struct {
-  sfp_uint32_field_t rx_pwr[5];
-  sfp_uint16_field_t txi_slope;
-  sfp_uint16_field_t txi_offset;
-  sfp_uint16_field_t tx_pwr_slope;
-  sfp_uint16_field_t tx_pwr_offset;
-  sfp_uint16_field_t t_slope;
-  sfp_uint16_field_t t_offset;
-  sfp_uint16_field_t v_slope;
-  sfp_uint16_field_t v_offset;
+  libsfp_u32_field_t rx_pwr[5];
+  libsfp_u16_field_t txi_slope;
+  libsfp_u16_field_t txi_offset;
+  libsfp_u16_field_t tx_pwr_slope;
+  libsfp_u16_field_t tx_pwr_offset;
+  libsfp_u16_field_t t_slope;
+  libsfp_u16_field_t t_offset;
+  libsfp_u16_field_t v_slope;
+  libsfp_u16_field_t v_offset;
   uint8_t unallocated[3];
   uint8_t checksum;
-} __attribute__((packed)) sfp_calibration_fields_t;
+} __attribute__((packed)) libsfp_calibration_fields_t;
 
 typedef struct {
-  sfp_uint16_field_t temperature;
-  sfp_uint16_field_t voltage;
-  sfp_uint16_field_t bias_current;
-  sfp_uint16_field_t tx_power;
-  sfp_uint16_field_t rx_power;
+  libsfp_u16_field_t temperature;
+  libsfp_u16_field_t voltage;
+  libsfp_u16_field_t bias_current;
+  libsfp_u16_field_t tx_power;
+  libsfp_u16_field_t rx_power;
   uint8_t unallocated[4];
   uint8_t status;
   uint8_t reserved;
@@ -111,28 +113,28 @@ typedef struct {
   uint8_t warnings[2];
   uint8_t estatus;
   uint8_t unallocated3;
-} __attribute__((packed)) sfp_rtdiagnostics_fields_t;
+} __attribute__((packed)) libsfp_rtdiagnostics_fields_t;
 
 /** Struct to present bank at address A0 */
 typedef struct {
-  sfp_base_fields_t base;
-  sfp_extended_fields_t ext;
-} __attribute__((packed)) sfp_A0_t;
+  libsfp_base_fields_t base;
+  libsfp_extended_fields_t ext;
+} __attribute__((packed)) libsfp_A0_t;
 
 /** Struct to present bank at address A2 */
 typedef struct {
-  sfp_thresholds_fields_t th;        /** Threshold fields section */
-  sfp_calibration_fields_t cl;       /** Calibration fields section */
-  sfp_rtdiagnostics_fields_t dg;     /** Diagnostic fields section */  
+  libsfp_thresholds_fields_t th;        /** Threshold fields section */
+  libsfp_calibration_fields_t cl;       /** Calibration fields section */
+  libsfp_rtdiagnostics_fields_t dg;     /** Diagnostic fields section */
   uint8_t vendor[8];
   uint8_t writable[120];
   uint8_t vendor2[8];
-} __attribute__((packed)) sfp_A2_t;
+} __attribute__((packed)) libsfp_A2_t;
 
 typedef struct {
-  sfp_A0_t a0;
-  sfp_A2_t a2;
-} __attribute__((packed)) sfp_dump_t;
+  libsfp_A0_t a0;
+  libsfp_A2_t a2;
+} __attribute__((packed)) libsfp_dump_t;
 
 
 /** Struct to store brief information for SFP module */
@@ -143,7 +145,7 @@ typedef struct {
   float rxpower;        /** SFP module rx power (mW) */
   uint32_t bitrate;     /** SFP module bitrate (bit/s)*/
   uint32_t spmode;      /** SFP module speed mode see LIBSFP_SPEED_MODE_* */
-} sfp_brief_info_t;
+} libsfp_brief_info_t;
 
 /** @brief Callback used for reading SFP module register memory
  *
@@ -156,7 +158,7 @@ typedef struct {
  *  @param count   count of bytes to read
  *  @param data    pointer to buffer to store data
  */
-typedef int(*sfp_readregs_fun_t)(void *udata, uint8_t addr,
+typedef int(*libsfp_readregs_cb_t)(void *udata, uint8_t addr,
                                  uint16_t start, uint16_t count, void *data);
 
 
@@ -192,6 +194,12 @@ typedef struct {
 int libsfp_init(libsfp_t **h);
 
 /**
+ * @brief Create library handle with default parameters
+ * @return libsfp handle or 0 if error occured
+ */
+libsfp_t *libsfp_create();
+
+/**
  * @brief Free library handle and its memory
  * @param h - pointer to library handle
  * @return 0 on success
@@ -204,7 +212,7 @@ int libsfp_free(libsfp_t *h);
  * @param readregs - address of callback function
  * @return 0 on success
  */
-int libsfp_set_readreg_callback(libsfp_t *h, sfp_readregs_fun_t readreg);
+int libsfp_set_readreg_callback(libsfp_t *h, libsfp_readregs_cb_t readreg);
 
 /**
  * @brief Assign userdata pointer for callback function
@@ -245,7 +253,7 @@ int libsfp_set_addresses(libsfp_t *h, uint8_t a0addr, uint8_t a2addr);
  * @param dump - pointer to memory to store information
  * @return 0 on success
  */
-int libsfp_readinfo(libsfp_t *h, sfp_dump_t *d);
+int libsfp_readinfo(libsfp_t *h, libsfp_dump_t *d);
 
 /**
  * @brief Output information selected by flags
@@ -254,7 +262,7 @@ int libsfp_readinfo(libsfp_t *h, sfp_dump_t *d);
  * @param dump  - pointer to struct that store information
  * @return 0 on success
  */
-void libsfp_printinfo(libsfp_t *h, sfp_dump_t *d);
+void libsfp_printinfo(libsfp_t *h, libsfp_dump_t *d);
 
 /**
  * @brief Read and output information selected by flags
@@ -271,7 +279,7 @@ int libsfp_showinfo(libsfp_t *h);
  * @param info - struct to store information
  * @return
  */
-int libsfp_readinfo_brief(libsfp_t *h, sfp_brief_info_t *info);
+int libsfp_readinfo_brief(libsfp_t *h, libsfp_brief_info_t *info);
 
 /**
  * @brief Get SFP module max speed (See LIBSFP_SPEED_MODE_* constants)

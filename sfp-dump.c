@@ -73,7 +73,7 @@ int print_help()
   printf("-v -- show verbose info (same as '-uctb')'\n");
   printf("-x -- show hex data\n");
   printf("-s -- show bit fields in short format\n");
-  printf("-u -- show unknown fields values\n");
+  printf("-u -- show fields with unknown/undefined values\n");
   printf("-c -- show calibration parameters\n");
   printf("-t -- show thresholds parameters\n");
   printf("-b -- show bit fields\n\n");
