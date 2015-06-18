@@ -1,3 +1,17 @@
+libx10-sfp (0.0.5) unstable; urgency=low
+
+ 2015/06/18
+
+   * Split library to some separated files [san]
+   * Added HEX output to bits fields and etc [san]
+   * Minimize read operation on read_info brief [san]
+   * Added register offsets & len constants [san] 
+   * Major internal renaming [san]
+   * Added sfp-dump util for demonstration [san]
+   * Added example of real module dumps to dumps subdir [san]
+
+ -- Alexander Buev <a.buev@metrotek.spb.ru>  Thu, 18 Jul 2015 16:04:53 +0400
+
 libx10-sfp (0.0.4) unstable; urgency=low
 
   2014-10-22

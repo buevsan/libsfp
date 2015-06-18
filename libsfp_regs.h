@@ -1,6 +1,12 @@
 #ifndef LIBSFP_REGS_H__
 #define LIBSFP_REGS_H__
 
+/**
+   @file
+   @brief libsfp register constants header file
+
+*/
+
 /* A0 bank */
 
 /* Offsets constants */
@@ -71,7 +77,7 @@
 
 /* A2 bank */
 
-/* Stanart offsets constants */
+/* Standart offsets constants */
 
 #define LIBSFP_OFS_A2_AW_THRESHOLDS          0
 #define LIBSFP_OFS_A2_UNALLOCATED0           40
@@ -91,6 +97,11 @@
 #define LIBSFP_OFS_A2_VENDOR_CONTROL         248
 
 /* Additional offests constansts */
+
+#define LIBSFP_OFS_A2_EXT_CAL_RXPWR          56
+#define LIBSFP_OFS_A2_EXT_CAL_TXPWR_SLOPE    80
+#define LIBSFP_OFS_A2_EXT_CAL_TXPWR_OFFSET   82
+
 #define LIBSFP_OFS_A2_DIAGNOSTICS_TXPOWER    102
 #define LIBSFP_OFS_A2_DIAGNOSTICS_RXPOWER    104
 
@@ -116,6 +127,12 @@
 
 
 /* Additional Length constansts */
+
+#define LIBSFP_LEN_A2_EXT_CAL_RXPWR         20
+#define LIBSFP_LEN_A2_EXT_CAL_TXPWR_SLOPE    2
+#define LIBSFP_LEN_A2_EXT_CAL_TXPWR_OFFSET   2
+
+
 #define LIBSFP_LEN_A2_DIAGNOSTICS_TXPOWER    2
 #define LIBSFP_LEN_A2_DIAGNOSTICS_RXPOWER    2
 
