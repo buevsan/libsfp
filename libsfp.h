@@ -41,14 +41,33 @@ typedef int(*libsfp_readregs_cb_t)(void *udata, uint8_t addr,
                                  uint16_t start, uint16_t count, void *data);
 
 
-#define LIBSFP_FLAGS_LONGOPT            1      /**< Output bit options as long list */
-#define LIBSFP_FLAGS_HEXOUTPUT          2      /**< Output hex values */
+/** @brief Callback used for writing SFP module register memory
+ *
+ *  @param udata   User provided data pointer\n
+ *                 (see libsfp_set_user_data to change)
+ *  @param addr    Memory bank address of SFP module\n
+ *                 see LIBSFP_DEF_* constants for defaut values\n
+ *                 see libsfp_set_addresses to changes default values
+ *  @param start   offset in bytes to start writing from
+ *  @param count   count of bytes to write
+ *  @param data    pointer to buffer with data
+ */
+typedef int(*libsfp_writeregs_cb_t)(void *udata, uint8_t addr,
+                                 uint16_t start, uint16_t count, const void *data);
+
+
+
+#define LIBSFP_FLAGS_PRINT_LONGOPT      1      /**< Output bit options as long list */
+#define LIBSFP_FLAGS_PRINT_HEXOUTPUT    2      /**< Output hex values */
 #define LIBSFP_FLAGS_PRINT_UNKNOWN      4      /**< Print fields with unknown values */
 #define LIBSFP_FLAGS_PRINT_CALIBRATIONS 0x08   /**< Print calibrations section info */
 #define LIBSFP_FLAGS_PRINT_THRESHOLDS   0x10   /**< Print thresholds section info */
 #define LIBSFP_FLAGS_PRINT_BITOPTIONS   0x20   /**< Print bit options fields */
 #define LIBSFP_FLAGS_PRINT_LASERAUTO    0x40   /**< Automaticaly detect laser/copper module
                                                     and do not printing not used values */
+#define LIBSFP_FLAGS_PRINT_CSUM         0x80   /**< Print checsum information */
+#define LIBSFP_FLAGS_PRINT_VENDOR       0x100  /**< Print vendor specific data dump */
+#define LIBSFP_FLAGS_CSUM_CHECK         0x200  /**< Check csum after reading */
 
 
 #define LIBSFP_SPEED_MODE_UNKNOWN   0     /**< Unknown speed */
@@ -92,6 +111,14 @@ int libsfp_free(libsfp_t *h);
  * @return 0 on success
  */
 int libsfp_set_readreg_callback(libsfp_t *h, libsfp_readregs_cb_t readreg);
+
+/**
+ * @brief Assign callback function address for reading access to SFP
+ * @param h - pointer to library handle
+ * @param readregs - address of callback function
+ * @return 0 on success
+ */
+int libsfp_set_writereg_callback(libsfp_t *h, libsfp_writeregs_cb_t writereg);
 
 /**
  * @brief Assign userdata pointer for callback function
@@ -174,6 +201,26 @@ int libsfp_get_copper_length(libsfp_t *h, uint8_t *ans);
  * @return 0 on success
  */
 int libsfp_is_directattach(libsfp_t *h, uint8_t *ans);
+
+/**
+ * @brief Get SFP module pins state (if supported)
+ * @param h      library handle
+ * @param value  pointer to bit value\n
+ *               see LIBSFP_A2_STATUSCONTROL_* constants
+ * @return 0 on success
+ */
+int libsfp_get_pins_state(libsfp_t *h, uint8_t *value);
+
+/**
+ * @brief Set SFP module soft pins (if supported)
+ * @param h      library handle
+ * @param mask   bit mask to set \n
+ *               see LIBSFP_A2_STATUSCONTROL_*_SET constants
+ * @param value  bit value\n
+ *               see LIBSFP_A2_STATUSCONTROL_*_SET constants
+ * @return 0 on success
+ */
+int libsfp_set_soft_pins_state(libsfp_t *h, uint8_t mask, uint8_t value);
 
 
 #ifdef __cplusplus

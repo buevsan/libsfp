@@ -21,7 +21,7 @@ int libsfp_init(libsfp_t **h)
   memset(H(*h), 0, sizeof(libsfp_int_t));
 
   H(*h)->file = stdout;
-  H(*h)->flags = LIBSFP_FLAGS_LONGOPT;
+  H(*h)->flags = LIBSFP_FLAGS_PRINT_LONGOPT;
 
   H(*h)->a0addr = LIBSFP_DEF_A0_ADDRESS;
   H(*h)->a2addr = LIBSFP_DEF_A2_ADDRESS;
@@ -174,9 +174,10 @@ float libsfp_get_biascurrent(libsfp_u16_field_t v, libsfp_calibration_fields_t *
   float f;
   f = ((float)( (v.d[0] << 8) | v.d[1])*(float)0.002);
 
-  if (cal)
+  if (cal) {
     f = (libsfp_get_slope(cal->txi_slope)*f +
          libsfp_get_offset(cal->txi_offset))*(float)0.002;
+  }
 
   return f;
 }
@@ -227,6 +228,41 @@ float libsfp_get_rxpower(libsfp_u16_field_t v, libsfp_u32_field_t *rx_pwr)
   return f;
 }
 
+/**
+ * @brief Calc simple check sum that used in SFP memory banks
+ * @param d    data pointer
+ * @param size data size
+ * @return Checksum;
+ */
+uint8_t libsfp_calc_csum(void *d, uint16_t size)
+{
+  uint16_t i;
+  uint32_t csum=0;
+  for (i=0; i<size; ++i)
+    csum += ((uint8_t*)d)[i];
+  return csum & 0xFF;
+}
+
+int libsfp_is_csums_correct(libsfp_t *h, libsfp_A0_t *a0, libsfp_A2_t *a2)
+{
+  if ( !(H(h)->flags & LIBSFP_FLAGS_CSUM_CHECK) )
+    return 0;
+
+  if (a0) {
+    if (a0->base.cc_base != libsfp_calc_csum(&a0->base, sizeof(a0->base) - 1))
+       return 1;
+
+    if (a0->ext.cc_ext != libsfp_calc_csum(&a0->ext, sizeof(a0->ext) - 1))
+       return 1;
+  }
+
+  if (a2) {
+    if (a2->cc_dmi != libsfp_calc_csum(a2, sizeof(a2->th) + sizeof(a2->cl)-1))
+      return 1;
+  }
+
+  return 0;
+}
 
 /**
  * @brief Read full SFP module info to memory
@@ -236,19 +272,26 @@ float libsfp_get_rxpower(libsfp_u16_field_t v, libsfp_u32_field_t *rx_pwr)
  */
 int libsfp_readinfo(libsfp_t *h, libsfp_dump_t *dump)
 {
-
   if (READREG_A0(h, 0, sizeof(libsfp_A0_t), &dump->a0))
     return -1;
 
-  if (!(dump->a0.ext.diag_mon_type & (0x1<<6)))
-   return 0;
+  if (dump->a0.ext.diag_mon_type & LIBSFP_A0_DIAGMON_TYPE_DDM) {
 
-  if (READREG_A2(h, 0, sizeof(libsfp_A2_t), &dump->a2))
-   return -1;
+    if (READREG_A2(h, 0, sizeof(libsfp_A2_t), &dump->a2))
+      return -1;
+
+    if (libsfp_is_csums_correct(h, &dump->a0, &dump->a2))
+      return -1;
+
+  } else {
+
+    if (libsfp_is_csums_correct(h, &dump->a0, 0))
+      return -1;
+
+  }
 
   return 0;
 }
-
 
 /**
  * @brief Read and output information selected by flags
@@ -330,7 +373,7 @@ int libsfp_readinfo_brief(libsfp_t *h, libsfp_brief_info_t *info)
   if (READREG_A0(h, LIBSFP_OFS_A0_DIAGMON_TYPE, 1, &dmtype))
     return -1;
 
-  if (!(dmtype & 0x40))
+  if (!(dmtype & LIBSFP_A0_DIAGMON_TYPE_DDM))
     return 0;  
 
   if (READREG_A2(h, LIBSFP_OFS_A2_DIAGNOSTICS_TXPOWER, 2, &tp))
@@ -339,7 +382,7 @@ int libsfp_readinfo_brief(libsfp_t *h, libsfp_brief_info_t *info)
   if (READREG_A2(h, LIBSFP_OFS_A2_DIAGNOSTICS_RXPOWER, 2, &rp))
     return -1;
 
-  if (dmtype & 0x10) {
+  if (dmtype & LIBSFP_A0_DIAGMON_TYPE_EXCAL) {
 
     /* Module power Externally calibrated
      * read calibration values */
@@ -410,7 +453,7 @@ int libsfp_is_copper_eth(libsfp_t *h, uint8_t *ans)
   if (READREG_A0(h, LIBSFP_OFS_A0_TRANSCEIVER+3, 1, ans))
     return -1;
 
-  (*ans) &= 0x08;
+  (*ans) = ((*ans) & 0x08) ? 1 : 0;
   return 0;
 }
 
@@ -428,7 +471,7 @@ int libsfp_is_directattach(libsfp_t *h, uint8_t *ans)
   if (READREG_A0(h, LIBSFP_OFS_A0_CONNECTOR, 1, &v))
     return -1;
 
-  if (v != 0x21)  /* Cooper */
+  if (v != LIBSFP_A0_CONNECTOR_COPPER)  /* Cooper */
     return 0;
 
   if (READREG_A0(h, LIBSFP_OFS_A0_TRANSCEIVER+5, 1, &v)) /* Passive cable */
@@ -451,6 +494,85 @@ int libsfp_get_copper_length(libsfp_t *h, uint8_t *ans)
 {
   if (READREG_A0(h, LIBSFP_OFS_A0_LENGTH_CABLE, 1, ans))
     return -1;
+
+  return 0;
+}
+
+
+/**
+ * @brief Get SFP module pins state (if supported)
+ * @param h      library handle
+ * @param value  pointer to bit value\n
+ *               see LIBSFP_A2_STATUSCONTROL_* constants
+ * @return 0 on success
+ */
+int libsfp_get_pins_state(libsfp_t *h, uint8_t *value)
+{
+  uint8_t dmtype;
+
+  if (READREG_A0(h, LIBSFP_OFS_A0_DIAGMON_TYPE, 1, &dmtype))
+    return -1;
+
+  if ((!(dmtype & LIBSFP_A0_DIAGMON_TYPE_DDM)))
+    return -1;
+
+  if (READREG_A2(h, LIBSFP_OFS_A2_STATUSCONTROL, 1, value))
+    return -1;
+
+  /* Clear bits not corresponding for pin states */
+  (*value) &= ~(LIBSFP_A2_STATUSCONTROL_TXD_SET | LIBSFP_A2_STATUSCONTROL_RS0_SET);
+
+  return 0;
+}
+
+/**
+ * @brief Set SFP module soft pins (if supported)
+ * @param h      library handle
+ * @param mask   bit mask to set \n
+ *               see LIBSFP_A2_STATUSCONTROL_*_SET constants
+ * @param value  bit value\n
+ *               see LIBSFP_A2_STATUSCONTROL_*_SET constants
+ * @return 0 on success
+ */
+int libsfp_set_soft_pins_state(libsfp_t *h, uint8_t mask, uint8_t value)
+{
+  uint8_t v, m;
+
+  if (READREG_A0(h, LIBSFP_OFS_A0_DIAGMON_TYPE, 1, &v))
+    return -1;
+
+  if (!(v & LIBSFP_A0_DIAGMON_TYPE_DDM))
+    return -1;
+
+  if (READREG_A0(h, LIBSFP_OFS_A0_ENHANCED_OPTIONS, 1, &v))
+    return -1;
+
+  if (v & LIBSFP_A0_ENHANCED_OPTIONS_TXDIS)
+    m |= LIBSFP_A2_STATUSCONTROL_TXD_SET;
+
+  if (v & LIBSFP_A0_ENHANCED_OPTIONS_RATESEL)
+    m |= LIBSFP_A2_STATUSCONTROL_RS0_SET;
+
+  /* Check that operation supported */
+  if (!m)
+    return -1;
+
+  /* only this bits can be set */
+  mask &= m;
+  value &= m;
+
+  /* if nothing to do  exit */
+  if (!mask)
+    return 0;
+
+  if (READREG_A2(h, LIBSFP_OFS_A2_STATUSCONTROL, 1, &v))
+    return -1;
+
+  v &= ~mask;
+  v |= value;
+
+  if (WRITEREG_A2(h, LIBSFP_OFS_A2_STATUSCONTROL, 1, &v))
+    return 1;
 
   return 0;
 }

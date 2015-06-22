@@ -95,7 +95,6 @@ typedef struct {
   libsfp_u16_field_t v_slope;
   libsfp_u16_field_t v_offset;
   uint8_t unallocated[3];
-  uint8_t checksum;
 } __attribute__((packed)) libsfp_calibration_fields_t;
 
 typedef struct {
@@ -124,10 +123,11 @@ typedef struct {
 typedef struct {
   libsfp_thresholds_fields_t th;        /** Threshold fields section */
   libsfp_calibration_fields_t cl;       /** Calibration fields section */
+  uint8_t cc_dmi;
   libsfp_rtdiagnostics_fields_t dg;     /** Diagnostic fields section */
-  uint8_t vendor[8];
-  uint8_t writable[120];
-  uint8_t vendor2[8];
+  uint8_t vendor_specific[8];
+  uint8_t user_eeprom[120];
+  uint8_t vendor_control[8];
 } __attribute__((packed)) libsfp_A2_t;
 
 

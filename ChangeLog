@@ -1,5 +1,13 @@
 libx10-sfp (0.0.5) unstable; urgency=low
 
+ 2015/06/22
+   
+   + Added support for SFP regs writing (experimental) [san] 
+   + Added support for set soft status control (experimental) [san]
+   + Added more bits/values constants [san]
+   + Added internal SFP checksum support & printing [san]
+   + Added printing of vendor specific area as hex dump [san]        
+
  2015/06/18
 
    * Split library to some separated files [san]

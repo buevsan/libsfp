@@ -70,33 +70,36 @@ int print_help()
   printf("\nDisplay SFP module dump information\n\n");
   printf("sfp-dump <options> [file1.bin] <file2.bin>\n\n");
   printf("-h -- show help\n");
-  printf("-v -- show verbose info (same as '-uctb')'\n");
+  printf("-v -- show verbose info (same as '-uctbm')'\n");
   printf("-x -- show hex data\n");
   printf("-s -- show bit fields in short format\n");
   printf("-u -- show fields with unknown/undefined values\n");
   printf("-c -- show calibration parameters\n");
   printf("-t -- show thresholds parameters\n");
-  printf("-b -- show bit fields\n\n");
+  printf("-b -- show bit fields\n");
+  printf("-m -- show checksum's field\n");
+  printf("-n -- show vendor spec. fields \n\n");
 }
 
 int parse_args(int argc, char **argv, prm_t *prm)
 {
    int opt;
-   while ((opt = getopt(argc, argv, "hvxuctbs")) != -1) {
+   while ((opt = getopt(argc, argv, "hvxuctbsmn")) != -1) {
      switch (opt) {
        case 'h':
          print_help();
          return 2;
        break;
        case 'v':
-         prm->flags = LIBSFP_FLAGS_LONGOPT |
+         prm->flags = LIBSFP_FLAGS_PRINT_LONGOPT |
                        LIBSFP_FLAGS_PRINT_UNKNOWN |
                        LIBSFP_FLAGS_PRINT_CALIBRATIONS |
                        LIBSFP_FLAGS_PRINT_THRESHOLDS |
-                       LIBSFP_FLAGS_PRINT_BITOPTIONS;
+                       LIBSFP_FLAGS_PRINT_BITOPTIONS |
+                       LIBSFP_FLAGS_PRINT_CSUM;
        break;
        case 'x':
-         prm->flags |= LIBSFP_FLAGS_HEXOUTPUT;
+         prm->flags |= LIBSFP_FLAGS_PRINT_HEXOUTPUT;
        break;
        case 'u':
          prm->flags |= LIBSFP_FLAGS_PRINT_UNKNOWN;
@@ -111,7 +114,13 @@ int parse_args(int argc, char **argv, prm_t *prm)
          prm->flags |= LIBSFP_FLAGS_PRINT_BITOPTIONS;
        break;
        case 's':
-         prm->flags &= ~LIBSFP_FLAGS_LONGOPT;
+         prm->flags &= ~LIBSFP_FLAGS_PRINT_LONGOPT;
+       break;
+       case 'm':
+         prm->flags |= LIBSFP_FLAGS_PRINT_CSUM;
+       break;
+       case 'n':
+         prm->flags |= LIBSFP_FLAGS_PRINT_VENDOR;
        break;
        default:
          ERR("Wrong option");
@@ -140,7 +149,7 @@ int main(int argc, char **argv)
 
   /* Set default parameters */
   memset(&prm, 0, sizeof(prm));
-  prm.flags = LIBSFP_FLAGS_LONGOPT;
+  prm.flags = LIBSFP_FLAGS_PRINT_LONGOPT;
 
   /* Parser CLI args */
   if (parse_args(argc, argv, &prm))
