@@ -1,6 +1,6 @@
 AC_PREREQ([2.63])
 AC_INIT([libsfp],
-        [0.0.4],
+        [0.0.6],
         [http://bugzilla.metrotek.spb.ru/enter_bug.cgi?product=libsfp],
         [libsfp])
 

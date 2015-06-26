@@ -8,6 +8,9 @@ sfp_dump_SOURCES = sfp-dump.c
 sfp_dump_LDFLAGS = -static 
 sfp_dump_LDADD= ./libsfp.la
 
+scriptsdir=$(bindir)
+scripts_DATA=read-sfp-dump
+
 x10includedir = $(includedir)
 x10include_HEADERS = libsfp.h libsfp_regs.h libsfp_types.h
 

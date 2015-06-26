@@ -31,3 +31,11 @@ Architecture: any
 Depends: libsfp (= ${binary:Version})
 Description: A library to access SFP transceiver information
  This package contains the debuging information (symbols).
+ 
+Package: sfp-tools
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Tools to manipulate SFP modules
+ This package contains executable files
+
+ 
