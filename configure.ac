@@ -20,4 +20,4 @@ AC_SUBST(LIBSFP_LIBS)
 
 INSTALL="$INSTALL -p"  # preserve the timestamps
 
-AC_OUTPUT([Makefile x10-sfp.pc])
+AC_OUTPUT([Makefile libsfp.pc])

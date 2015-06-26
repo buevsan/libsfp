@@ -1,0 +1,48 @@
+
+lib-sfp (0.0.5-1) unstable; urgency=low
+
+  2015/06/26 
+    * renaming to libsfp  -> build files updated
+    * New version: 0.0.5.  [san]   
+
+
+ -- Alexander Buev <alexander.buev@gmail.com> Fri, 26 Jul 2015 12:01:29 +0400
+
+libx10-sfp (0.0.4-1) unstable; urgency=low
+
+    * New version: 0.0.4.
+
+ -- Paul Wolneykien <p.wolneykien@metrotek.spb.ru>  Fri, 31 Oct 2014 17:32:00 +0400
+
+libx10-sfp (0.0.3-2) unstable; urgency=low
+
+  2014/07/08
+
+    * Declare the conflict with the old-named packages. [pw]
+    * Include the library version in the shlibs dependency
+      field (overriding the `dh_makeshlibs`). [pw]
+    * Strict all the static dependencies. [pw]
+
+ -- Paul Wolneykien <p.wolneykien@metrotek.spb.ru>  Tue, 08 Jul 2014 13:55:00 +0400
+
+libx10-sfp (0.0.3-1) unstable; urgency=low
+
+    * Use dh-autoreconf
+    * Improve file layout
+    * Make the -dbg package to be built
+    * Make the debian/rules handle the CONFIGURE_ARGS env var
+    * Rename the .deb: use the "libx10-<name>" scheme
+
+ -- Paul Wolneykien <p.wolneykien@metrotek.spb.ru>  Thu, 24 Jun 2014 15:20:00 +0400
+
+x10-libsfp (0.0.2-1) unstable; urgency=low
+
+  * New release with build warnings fixes
+
+ -- Sergey Kolemagin <s.kolemagin@metrotek.spb.ru>  Tue, 03 Jun 2014 14:12:20 +0400
+
+x10-libsfp (0.0.1-1) unstable; urgency=low
+
+  * Initial release
+
+ -- Vadim Popov <v.popov@metrotek.spb.ru>  Tue, 23 Jul 2013 16:05:38 +0400

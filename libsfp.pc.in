@@ -3,9 +3,9 @@ exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
 
-Name: x10-sfp
+Name: sfp
 Description: Small form-factor pluggable transceiver (SFP) information library
 Version: @VERSION@
 Requires:
-Libs: -L${libdir} -lx10-sfp
-Cflags: -I${includedir}/x10
+Libs: -L${libdir} -lsfp
+Cflags: -I${includedir}

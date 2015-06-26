@@ -1,0 +1,33 @@
+Source: libsfp
+Section: contrib/devel
+Priority: extra
+Maintainer: Alexander Buev <a.buev@metrotek.spb.ru>
+Build-Depends: debhelper (>= 8.0.0), dh-autoreconf
+Standards-Version: 3.9.2
+Homepage: http://metrotek.spb.ru
+
+Package: libsfp
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Replaces: x10-libsfp
+Breaks: x10-libsfp
+Description: A library to access SFP transceiver information
+
+Package: libsfp-static
+Architecture: any
+Depends:
+Description: A library to access SFP transceiver information
+ This package contains the static library files.
+
+Package: libsfp-dev
+Architecture: any
+Depends: libsfp (= ${binary:Version})
+Description: A library to access SFP transceiver information
+ This package contains the development files.
+
+Package: libsfp-dbg
+Section: contrib/debug
+Architecture: any
+Depends: libsfp (= ${binary:Version})
+Description: A library to access SFP transceiver information
+ This package contains the debuging information (symbols).

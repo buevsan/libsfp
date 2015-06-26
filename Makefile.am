@@ -1,17 +1,17 @@
 
-lib_LTLIBRARIES = libx10-sfp.la
-libx10_sfp_la_SOURCES = libsfp.c libsfp_print.c 
-libx10_sfp_la_LDFLAGS = 
+lib_LTLIBRARIES = libsfp.la
+libsfp_la_SOURCES = libsfp.c libsfp_print.c 
+libsfp_la_LDFLAGS = 
 
 bin_PROGRAMS = sfp-dump
 sfp_dump_SOURCES = sfp-dump.c
 sfp_dump_LDFLAGS = -static
-sfp_dump_LDADD=./libx10-sfp.la
+sfp_dump_LDADD=./libsfp.la
 
-x10includedir = $(includedir)/x10
+x10includedir = $(includedir)
 x10include_HEADERS = libsfp.h libsfp_regs.h libsfp_types.h
 
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = x10-sfp.pc
+pkgconfig_DATA = libsfp.pc
 
-DISTCLEANFILES = x10-sfp.pc
+DISTCLEANFILES = libsfp.pc

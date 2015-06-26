@@ -1,0 +1,4 @@
+/usr/lib*/*.so
+/usr/lib*/*.la
+/usr/include/x10/*.h
+/usr/lib*/pkgconfig/*.pc
