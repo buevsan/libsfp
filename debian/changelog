@@ -1,9 +1,16 @@
-libsfp (0.0.6.1) unstable; urgency=low
+libsfp (0.0.6-2) unstable; urgency=low
 
-  2015/06/26 
+  2015/06/29
+
+   * Multi-arch build.
+
+ -- Paul Wolneykien <p.wolneykien@metrotek.spb.ru>  Mon, 29 Jun 2015 12:16:00 +0400
+
+libsfp (0.0.6-1) unstable; urgency=low
+
+  2015/06/26
     * renaming to libsfp  -> build files updated
-    * New version: 0.0.6.  [san]   
-
+    * New version: 0.0.6.  [san]
 
  -- Alexander Buev <alexander.buev@gmail.com>  Fri, 26 Jul 2015 12:01:29 +0400
 

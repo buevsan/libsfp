@@ -1,4 +1,4 @@
-/usr/lib*/*.so
-/usr/lib*/*.la
+/usr/lib/*/*.so
+/usr/lib/*/*.la
 /usr/include/*.h
-/usr/lib*/pkgconfig/*.pc
+/usr/lib/*/pkgconfig/*.pc

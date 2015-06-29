@@ -9,19 +9,16 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
+DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
+
 .PHONY: override_dh_strip
 
 override_dh_auto_configure:
-	dh_auto_configure -- $(CONFIGURE_ARGS)
+	dh_auto_configure -- --host=$(DEB_HOST_MULTIARCH) \
+			     --prefix=/usr --libdir=/usr/lib/$(DEB_HOST_MULTIARCH)
 
 override_dh_strip:
 	dh_strip --dbg-package=libsfp-dbg
 
-override_dh_makeshlibs:
-	dh_makeshlibs -V
-
 %:
 	dh $@ --with autoreconf
-
-override_dh_shlibdeps:
-	dh_shlibdeps -- $${ROOTDIR:+-S$$ROOTDIR} $${SHLIBS:+-L$$SHLIBS}
