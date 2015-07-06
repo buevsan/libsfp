@@ -17,11 +17,12 @@ typedef struct {
 typedef struct {
   char sbuf[16];                 /** Internal string buffer */
   uint32_t flags;                /** Library flags  */
-  FILE *file;                    /** File for text output */
   void *udata;                   /** User data pointer */
   uint8_t a0addr, a2addr;        /** SFP Bank addresses to use */
-  libsfp_readregs_cb_t readregs;   /** Callback for read information */
-  libsfp_writeregs_cb_t writeregs;  /** Callback for write information */
+  libsfp_readregs_cb_t readregs;   /** Callback to read information */
+  libsfp_writeregs_cb_t writeregs;  /** Callback to write information */
+  libsfp_printname_cb_t printname;   /** Callback to print parameter name */
+  libsfp_printvalue_cb_t printvalue;  /** Callback to print parameter value */
 } libsfp_int_t;
 
 #define H(ptr) ((libsfp_int_t*)(ptr))

@@ -55,6 +55,20 @@ typedef int(*libsfp_readregs_cb_t)(void *udata, uint8_t addr,
 typedef int(*libsfp_writeregs_cb_t)(void *udata, uint8_t addr,
                                  uint16_t start, uint16_t count, const void *data);
 
+/** @brief Callback to print SFP module parameter name.
+ *
+ *  @param udata   User provided data pointer (see libsfp_set_user_data).
+ *  @param name    SFP module parameter name.
+ */
+typedef void (*libsfp_printname_cb_t)( void *udata, const char *name );
+
+
+/** @brief Callback to print SFP module parameter value.
+ *
+ *  @param udata   User provided data pointer (see libsfp_set_user_data).
+ *  @param value    SFP module parameter value.
+ */
+typedef void (*libsfp_printvalue_cb_t)( void *udata, const char *value );
 
 
 #define LIBSFP_FLAGS_PRINT_LONGOPT      1      /**< Output bit options as long list */
