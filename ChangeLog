@@ -3,9 +3,10 @@ libsfp (0.1.0) unstable; urgency=low
   2015/07/07
 
     * New version: 0.1.0:
-    * libsfp.[h,c]: Declare print callbacks (name, value and newline).
+    * libsfp.[h,c], libsfp_print.c: Declare print callbacks (name, value and newline).
+    * sfp_dump.c: Add support for HTML output.
 
- -- Paul Wolneykien <p.wolneykien@metrotek.spb.ru>  Tue, 07 Jul 2015 13:22:00 +0300
+ -- Paul Wolneykien <p.wolneykien@metrotek.spb.ru>  Tue, 07 Jul 2015 13:52:00 +0300
 
 libsfp (0.0.6) unstable; urgency=low
   

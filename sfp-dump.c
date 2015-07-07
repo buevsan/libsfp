@@ -14,6 +14,7 @@
 typedef struct {
   char *file1, *file2;
   uint32_t flags;
+  int html;
 } prm_t;
 
 int read_sfp_dump(void *udata, uint8_t bank_addr, uint16_t start,
@@ -78,13 +79,16 @@ int print_help()
   printf("-t -- show thresholds parameters\n");
   printf("-b -- show bit fields\n");
   printf("-m -- show checksum's field\n");
-  printf("-n -- show vendor spec. fields \n\n");
+  printf("-n -- show vendor spec. fields\n");
+  printf("-H -- output in HTML\n\n");
 }
 
 int parse_args(int argc, char **argv, prm_t *prm)
 {
+   prm->html = 0;
+  
    int opt;
-   while ((opt = getopt(argc, argv, "hvxuctbsmn")) != -1) {
+   while ((opt = getopt(argc, argv, "hvxuctbsmnH")) != -1) {
      switch (opt) {
        case 'h':
          print_help();
@@ -122,6 +126,9 @@ int parse_args(int argc, char **argv, prm_t *prm)
        case 'n':
          prm->flags |= LIBSFP_FLAGS_PRINT_VENDOR;
        break;
+       case 'H':
+         prm->html = 1;
+       break;
        default:
          ERR("Wrong option");
          print_help();
@@ -140,6 +147,11 @@ int parse_args(int argc, char **argv, prm_t *prm)
 
   return 0;
 }
+
+
+static void printname_html( void *udata, const char *name );
+static void printvalue_html( void *udata, const char *value );
+static void printnewline_html( void *udata );
 
 int main(int argc, char **argv)
 {
@@ -167,6 +179,13 @@ int main(int argc, char **argv)
   libsfp_set_flags(handle,prm.flags);
   libsfp_set_user_data(handle, &prm);
 
+  if ( prm.html ) {
+    printf( "<table>\n" );
+    libsfp_set_printname_callback( handle, printname_html );
+    libsfp_set_printvalue_callback( handle, printvalue_html );
+    libsfp_set_printnewline_callback( handle, printnewline_html );
+  }
+
   /* Normaly we do not need set this (it's a default values)
   libsfp_set_outfile(handle, stdout);
   libsfp_set_addresses(handle,
@@ -187,5 +206,26 @@ exit:
   if (handle)
     libsfp_free(handle);
 
+  if ( prm.html )
+    printf( "</table>\n" );
+
   return ret;
+}
+
+static void printname_html( void *udata, const char *name )
+{
+  printf( " <tr>\n" );
+  printf( "  <td><b>%s</b></td>\n", name );
+  printf( "  <td><b>:</b> " );
+}
+
+static void printvalue_html( void *udata, const char *value )
+{
+  printf( "%s", value );
+}
+
+static void printnewline_html( void *udata )
+{
+  printf( "  </td>\n" );
+  printf( " </tr>\n" );
 }
