@@ -20,11 +20,14 @@ int libsfp_init(libsfp_t **h)
     return -1;
   memset(H(*h), 0, sizeof(libsfp_int_t));
 
-  H(*h)->file = stdout;
   H(*h)->flags = LIBSFP_FLAGS_PRINT_LONGOPT;
 
   H(*h)->a0addr = LIBSFP_DEF_A0_ADDRESS;
   H(*h)->a2addr = LIBSFP_DEF_A2_ADDRESS;
+
+  libsfp_set_printname_callback( *h, libsfp_printname_default );
+  libsfp_set_printvalue_callback( *h, libsfp_printvalue_default );
+  libsfp_set_printnewline_callback( *h, libsfp_printnewline_default );
 
   return 0;
 }
@@ -66,7 +69,43 @@ int libsfp_set_readreg_callback(libsfp_t *h, libsfp_readregs_cb_t readregs)
 }
 
 /**
- * @brief Assign userdata pointer for callback function
+ * @brief Assign name print callback function address
+ * @param h - pointer to library handle
+ * @param printname - address of the callback function
+ * @return 0 on success
+ */
+int libsfp_set_printname_callback(libsfp_t *h, libsfp_printname_cb_t printname)
+{
+  H(h)->printname = printname;
+  return 0;
+}
+
+/**
+ * @brief Assign value print callback function address
+ * @param h - pointer to library handle
+ * @param printvalue - address of the callback function
+ * @return 0 on success
+ */
+int libsfp_set_printvalue_callback(libsfp_t *h, libsfp_printvalue_cb_t printvalue)
+{
+  H(h)->printvalue = printvalue;
+  return 0;
+}
+
+/**
+ * @brief Assign newline print callback function address
+ * @param h - pointer to library handle
+ * @param printnewline - address of the callback function
+ * @return 0 on success
+ */
+int libsfp_set_printnewline_callback(libsfp_t *h, libsfp_printvalue_cb_t printnewline)
+{
+  H(h)->printnewline = printnewline;
+  return 0;
+}
+
+/**
+ * @brief Assign userdata pointer for callback functions
  * @param h - pointer to library handle
  * @param udata - pointer to user data
  * @return 0 on success
@@ -74,18 +113,6 @@ int libsfp_set_readreg_callback(libsfp_t *h, libsfp_readregs_cb_t readregs)
 int libsfp_set_user_data(libsfp_t *h, void *udata)
 {
   H(h)->udata = udata;
-  return 0;
-}
-
-/**
- * @brief Assign file pointer used for text output
- * @param h - pointer to library handle
- * @param f - file pointer
- * @return 0 on success
- */
-int libsfp_set_outfile(libsfp_t *h, FILE *f)
-{
-  H(h)->file = f;
   return 0;
 }
 
@@ -575,4 +602,36 @@ int libsfp_set_soft_pins_state(libsfp_t *h, uint8_t mask, uint8_t value)
     return 1;
 
   return 0;
+}
+
+/**
+ * @brief The default name print function. It prints to stdout.
+ *
+ * @param udata   User provided data pointer (see libsfp_set_user_data).
+ * @param name    SFP module parameter name.
+ */
+static void libsfp_printname_default( void *udata, const char *name )
+{
+  printf( "%-32s %s", name, ": ");
+}
+
+/**
+ * @brief The default value print function. It prints to stdout.
+ *
+ * @param udata   User provided data pointer (see libsfp_set_user_data).
+ * @param value    SFP module parameter value.
+ */
+static void libsfp_printvalue_default( void *udata, const char *value )
+{
+  printf( value );
+}
+
+/**
+ * @brief The default newline print function. It prints to stdout.
+ *
+ * @param udata   User provided data pointer (see libsfp_set_user_data).
+ */
+static void libsfp_printnewline_default( void *udata )
+{
+  printf( "\n" );
 }

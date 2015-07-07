@@ -23,6 +23,7 @@ typedef struct {
   libsfp_writeregs_cb_t writeregs;  /** Callback to write information */
   libsfp_printname_cb_t printname;   /** Callback to print parameter name */
   libsfp_printvalue_cb_t printvalue;  /** Callback to print parameter value */
+  libsfp_printnewline_cb_t printnewline;  /** Callback to print parameter newline */
 } libsfp_int_t;
 
 #define H(ptr) ((libsfp_int_t*)(ptr))

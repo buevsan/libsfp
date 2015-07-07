@@ -70,6 +70,12 @@ typedef void (*libsfp_printname_cb_t)( void *udata, const char *name );
  */
 typedef void (*libsfp_printvalue_cb_t)( void *udata, const char *value );
 
+/** @brief Callback to print the newline.
+ *
+ *  @param udata   User provided data pointer (see libsfp_set_user_data).
+ */
+typedef void (*libsfp_printnewline_cb_t)( void *udata );
+
 
 #define LIBSFP_FLAGS_PRINT_LONGOPT      1      /**< Output bit options as long list */
 #define LIBSFP_FLAGS_PRINT_HEXOUTPUT    2      /**< Output hex values */
@@ -135,20 +141,28 @@ int libsfp_set_readreg_callback(libsfp_t *h, libsfp_readregs_cb_t readreg);
 int libsfp_set_writereg_callback(libsfp_t *h, libsfp_writeregs_cb_t writereg);
 
 /**
- * @brief Assign userdata pointer for callback function
+ * @brief Assign name print callback function address
+ * @param h - pointer to library handle
+ * @param readregs - address of the callback function
+ * @return 0 on success
+ */
+int libsfp_set_printname_callback(libsfp_t *h, libsfp_printname_cb_t printname);
+
+/**
+ * @brief Assign value print callback function address
+ * @param h - pointer to library handle
+ * @param readregs - address of the callback function
+ * @return 0 on success
+ */
+int libsfp_set_printvalue_callback(libsfp_t *h, libsfp_printvalue_cb_t printvalue);
+
+/**
+ * @brief Assign userdata pointer for callback functions
  * @param h - pointer to library handle
  * @param udata - pointer to user data
  * @return 0 on success
  */
 int libsfp_set_user_data(libsfp_t *h, void *udata);
-
-/**
- * @brief Assign file pointer used for text output
- * @param h - pointer to library handle
- * @param f - file pointer
- * @return 0 on success
- */
-int libsfp_set_outfile(libsfp_t *h, FILE *f);
 
 /**
  * @brief Assign some option flags used for modify output text information
