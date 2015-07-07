@@ -8,6 +8,10 @@
 #include "libsfp_int.h"
 #include "libsfp_print.h"
 
+static void libsfp_printname_default( void *udata, const char *name );
+static void libsfp_printvalue_default( void *udata, const char *value );
+static void libsfp_printnewline_default( void *udata );
+
 /**
  * @brief Create library handle with default parameters
  * @param h - pointer to address of library handle
@@ -98,7 +102,7 @@ int libsfp_set_printvalue_callback(libsfp_t *h, libsfp_printvalue_cb_t printvalu
  * @param printnewline - address of the callback function
  * @return 0 on success
  */
-int libsfp_set_printnewline_callback(libsfp_t *h, libsfp_printvalue_cb_t printnewline)
+int libsfp_set_printnewline_callback(libsfp_t *h, libsfp_printnewline_cb_t printnewline)
 {
   H(h)->printnewline = printnewline;
   return 0;
@@ -619,11 +623,11 @@ static void libsfp_printname_default( void *udata, const char *name )
  * @brief The default value print function. It prints to stdout.
  *
  * @param udata   User provided data pointer (see libsfp_set_user_data).
- * @param value    SFP module parameter value.
+ * @param value   SFP module parameter value.
  */
 static void libsfp_printvalue_default( void *udata, const char *value )
 {
-  printf( value );
+  printf( "%s", value );
 }
 
 /**

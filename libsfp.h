@@ -157,6 +157,14 @@ int libsfp_set_printname_callback(libsfp_t *h, libsfp_printname_cb_t printname);
 int libsfp_set_printvalue_callback(libsfp_t *h, libsfp_printvalue_cb_t printvalue);
 
 /**
+ * @brief Assign newline print callback function address
+ * @param h - pointer to library handle
+ * @param printnewline - address of the callback function
+ * @return 0 on success
+ */
+int libsfp_set_printnewline_callback(libsfp_t *h, libsfp_printnewline_cb_t printnewline);
+
+/**
  * @brief Assign userdata pointer for callback functions
  * @param h - pointer to library handle
  * @param udata - pointer to user data

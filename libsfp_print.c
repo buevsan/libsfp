@@ -1,9 +1,11 @@
 #include "libsfp_int.h"
 #include <stdarg.h>
 
+static void libsfp_printf_value( libsfp_int_t *h, const char *format, ... );
+
 #define SFPPRINT(h, format, ...) libsfp_printf_value(H(h), format, ##__VA_ARGS__)
 #define SFPPRINTNAME(h, name) H(h)->printname(H(h)->udata, name)
-#define SFPNEWLINE(h, name) H(h)->printnewline(H(h)->udata)
+#define SFPNEWLINE(h) H(h)->printnewline(H(h)->udata)
 #define LIBSFP_VLFMT "%35s"
 
 #define ARRAY_SIZE(a) (sizeof(a)/sizeof(a[0]))
@@ -997,10 +999,10 @@ void libsfp_printinfo(libsfp_t *h, libsfp_dump_t *dump)
 /**
  * @brief Calls the printvalue callback.
  *
- * @param h the     library handle
+ * @param h the     the internal library handle
  * @param format    the string format (tempalte)
  */
-void libsfp_printf_value( libsfp_t *h, const char *format, ... )
+static void libsfp_printf_value( libsfp_int_t *h, const char *format, ... )
 {
   va_list args;
   char buf[VALBUFSIZE];
