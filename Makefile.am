@@ -1,7 +1,7 @@
 
 lib_LTLIBRARIES = libsfp.la
 libsfp_la_SOURCES = libsfp.c libsfp_print.c 
-libsfp_la_LDFLAGS = 
+libsfp_la_LDFLAGS = -version-info @LIBSFP_VERSION@
 
 bin_PROGRAMS = sfp-dump
 sfp_dump_SOURCES = sfp-dump.c

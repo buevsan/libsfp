@@ -1,6 +1,6 @@
 AC_PREREQ([2.63])
 AC_INIT([libsfp],
-        [0.0.6],
+        [0.1.0],
         [http://bugzilla.metrotek.spb.ru/enter_bug.cgi?product=libsfp],
         [libsfp])
 
@@ -15,6 +15,7 @@ AC_ARG_ENABLE([rpath],
 AM_INIT_AUTOMAKE([1.11 -Wno-portability dist-xz no-dist-gzip])
 AM_MAINTAINER_MODE([enable])
 
+AC_SUBST(LIBSFP_VERSION, [1:0:0])
 AC_SUBST(LIBSFP_CFLAGS)
 AC_SUBST(LIBSFP_LIBS)
 
