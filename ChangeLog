@@ -1,4 +1,16 @@
+libsfp (0.2.0) unstable; urgency=low
+
+  2015/08/24
+    
+    * New version: 0.2.0 
+    * Moved print callbacks to libsfp_print.c
+    * Use single function to setup all print callbacks 
+
+
+ -- Alexander Buev <a.buev@metrotek.spb.ru>  San, 24 Aug 2015 16:02:28 +0400
+
 libsfp (0.1.0) unstable; urgency=low
+
 
   2015/07/07
 
