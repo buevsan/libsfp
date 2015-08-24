@@ -55,6 +55,7 @@ typedef int(*libsfp_readregs_cb_t)(void *udata, uint8_t addr,
 typedef int(*libsfp_writeregs_cb_t)(void *udata, uint8_t addr,
                                  uint16_t start, uint16_t count, const void *data);
 
+
 /** @brief Callback to print SFP module parameter name.
  *
  *  @param udata   User provided data pointer (see libsfp_set_user_data).
@@ -75,6 +76,13 @@ typedef void (*libsfp_printvalue_cb_t)( void *udata, const char *value );
  *  @param udata   User provided data pointer (see libsfp_set_user_data).
  */
 typedef void (*libsfp_printnewline_cb_t)( void *udata );
+
+
+typedef struct libsfp_print_callbacks_s {
+  libsfp_printname_cb_t name;
+  libsfp_printvalue_cb_t value;
+  libsfp_printnewline_cb_t newline;
+} libsfp_print_callbacks_t;
 
 
 #define LIBSFP_FLAGS_PRINT_LONGOPT      1      /**< Output bit options as long list */
@@ -146,23 +154,7 @@ int libsfp_set_writereg_callback(libsfp_t *h, libsfp_writeregs_cb_t writereg);
  * @param readregs - address of the callback function
  * @return 0 on success
  */
-int libsfp_set_printname_callback(libsfp_t *h, libsfp_printname_cb_t printname);
-
-/**
- * @brief Assign value print callback function address
- * @param h - pointer to library handle
- * @param readregs - address of the callback function
- * @return 0 on success
- */
-int libsfp_set_printvalue_callback(libsfp_t *h, libsfp_printvalue_cb_t printvalue);
-
-/**
- * @brief Assign newline print callback function address
- * @param h - pointer to library handle
- * @param printnewline - address of the callback function
- * @return 0 on success
- */
-int libsfp_set_printnewline_callback(libsfp_t *h, libsfp_printnewline_cb_t printnewline);
+int libsfp_set_print_callbacks(libsfp_t *h, const libsfp_print_callbacks_t *callbacks);
 
 /**
  * @brief Assign userdata pointer for callback functions

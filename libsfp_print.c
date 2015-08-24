@@ -4,8 +4,8 @@
 static void libsfp_printf_value( libsfp_int_t *h, const char *format, ... );
 
 #define SFPPRINT(h, format, ...) libsfp_printf_value(H(h), format, ##__VA_ARGS__)
-#define SFPPRINTNAME(h, name) H(h)->printname(H(h)->udata, name)
-#define SFPNEWLINE(h) H(h)->printnewline(H(h)->udata)
+#define SFPPRINTNAME(h, name_str) H(h)->print_cb.name(H(h)->udata, name_str)
+#define SFPNEWLINE(h) H(h)->print_cb.newline(H(h)->udata)
 #define LIBSFP_VLFMT "%35s"
 
 #define ARRAY_SIZE(a) (sizeof(a)/sizeof(a[0]))
@@ -1011,5 +1011,38 @@ static void libsfp_printf_value( libsfp_int_t *h, const char *format, ... )
   vsnprintf( buf, sizeof( buf ), format, args );
   va_end( args );
 
-  h->printvalue( h->udata, buf );
+  h->print_cb.value( h->udata, buf );
 }
+
+/**
+ * @brief The default name print function. It prints to stdout.
+ *
+ * @param udata   User provided data pointer (see libsfp_set_user_data).
+ * @param name    SFP module parameter name.
+ */
+void libsfp_printname_default( void *udata, const char *name )
+{
+  printf( "%-32s %s", name, ": ");
+}
+
+/**
+ * @brief The default value print function. It prints to stdout.
+ *
+ * @param udata   User provided data pointer (see libsfp_set_user_data).
+ * @param value   SFP module parameter value.
+ */
+void libsfp_printvalue_default( void *udata, const char *value )
+{
+  printf( "%s", value );
+}
+
+/**
+ * @brief The default newline print function. It prints to stdout.
+ *
+ * @param udata   User provided data pointer (see libsfp_set_user_data).
+ */
+void libsfp_printnewline_default( void *udata )
+{
+  printf( "\n" );
+}
+

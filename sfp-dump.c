@@ -158,6 +158,7 @@ int main(int argc, char **argv)
   libsfp_t *handle = 0;
   int ret = 0 ;
   prm_t prm;
+  libsfp_print_callbacks_t callbacks;
 
   /* Set default parameters */
   memset(&prm, 0, sizeof(prm));
@@ -181,9 +182,10 @@ int main(int argc, char **argv)
 
   if ( prm.html ) {
     printf( "<table>\n" );
-    libsfp_set_printname_callback( handle, printname_html );
-    libsfp_set_printvalue_callback( handle, printvalue_html );
-    libsfp_set_printnewline_callback( handle, printnewline_html );
+    callbacks.name = printname_html;
+    callbacks.newline = printnewline_html;
+    callbacks.value = printvalue_html;
+    libsfp_set_print_callbacks( handle, &callbacks );
   }
 
   /* Normaly we do not need set this (it's a default values)
