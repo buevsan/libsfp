@@ -335,7 +335,7 @@ int libsfp_showinfo(libsfp_t *h)
   return 0;
 }
 
-uint32_t libsfp_bitrate2speed_mode(uint16_t br)
+uint32_t libsfp_bitrate2speed_mode(uint8_t br)
 {
   uint32_t smode;
   smode = LIBSFP_SPEED_MODE_UNKNOWN;
